@@ -1,0 +1,97 @@
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: no
+  vars:
+     ansible_python_interpreter: /usr/bin/python2.7
+     bits_dir: "/tmp/bits"
+     gflags_git_url: https://github.com/gflags/gflags.git
+     gflags_version: v2.2.1
+     glog_git_url: https://github.com/google/glog.git
+     glog_version: v0.3.5
+     gtest_git_url: https://github.com/google/googletest.git
+     gtest_version: release-1.8.0
+     
+  tasks:
+    - name: Clone gflags
+      git:
+        repo: "{{ gflags_git_url }}"
+        dest: "{{ bits_dir }}/gflags"
+        version: "{{ gflags_version }}"
+
+    - name: Make gflags build
+      file:
+        path: "{{ bits_dir }}/gflags/build"
+        state: directory
+        mode: 0755
+
+    - name: gflags cmake
+      command: /usr/local/bin/cmake "{{ bits_dir }}/gflags"
+      args:
+        chdir: "{{ bits_dir }}/gflags/build"
+
+    - name: gflags build
+      command: make -j 4
+      args:
+        chdir: "{{ bits_dir }}/gflags/build"
+
+    - name: gflags install
+      command: make install
+      args:
+        chdir: "{{ bits_dir }}/gflags/build"
+
+    - name: Clone glog
+      git:
+        repo: "{{ glog_git_url }}"
+        dest: "{{ bits_dir }}/glog"
+        version: "{{ glog_version }}"
+
+    - name: Make glog build
+      file:
+        path: "{{ bits_dir }}/glog/build"
+        state: directory
+        mode: 0755
+
+    - name: glog cmake
+      command: /usr/local/bin/cmake "{{ bits_dir }}/glog"
+      args:
+        chdir: "{{ bits_dir }}/glog/build"
+
+    - name: glog build
+      command: make -j 4
+      args:
+        chdir: "{{ bits_dir }}/glog/build"
+
+    - name: glog install
+      command: make install
+      args:
+        chdir: "{{ bits_dir }}/glog/build"
+
+    - name: Clone gtest
+      git:
+        repo: "{{ gtest_git_url }}"
+        dest: "{{ bits_dir }}/gtest"
+        version: "{{ gtest_version }}"
+
+    - name: Make gtest build
+      file:
+        path: "{{ bits_dir }}/gtest/build"
+        state: directory
+        mode: 0755
+
+    - name: gtest cmake
+      command: /usr/local/bin/cmake "{{ bits_dir }}/gtest"
+      args:
+        chdir: "{{ bits_dir }}/gtest/build"
+
+    - name: gtest build
+      command: make -j 4
+      args:
+        chdir: "{{ bits_dir }}/gtest/build"
+
+    - name: gtest install
+      command: make install
+      args:
+        chdir: "{{ bits_dir }}/gtest/build"
+
+        

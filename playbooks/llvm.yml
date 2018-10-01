@@ -1,0 +1,219 @@
+
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: no
+  vars:
+     ansible_python_interpreter: /usr/bin/python2.7
+     llvm_src_dir: /opt/llvm
+     clang_release: release_70
+     clang_build_dir: /opt/clang-build
+     clang_build_type: Release
+     ansible_distribution_major_version: 7
+     cmake_src_dir: /opt/cmake
+     cmake_build_dir: /opt/cmake-build
+
+  tasks:
+    - name: Yum Development Tools
+      yum:
+        name: "@Development Tools"
+        state: present
+
+    - name: YUM ELRepo Key
+      command: "rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org"
+
+    - name: Yum ELRepo
+      yum:
+        name: "http://elrepo.org/linux/elrepo/el7/x86_64/RPMS/elrepo-release-7.0-3.el7.elrepo.noarch.rpm"
+        state: present
+
+    - name: Yum Epel
+      yum:
+        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+        state: present
+      
+    - name: Import EPEL GPG key.
+      rpm_key:
+        key: "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+        state: present
+
+    - name: Yum packages
+      yum:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - gettext-devel
+          - openssl-devel
+          - perl-CPAN
+          - perl-devel
+          - zlib-devel
+          - libyaml-devel
+          - man-pages
+          - python36
+          - python-virtualenv
+          - numactl
+          - numactl-libs
+          - numactl-devel
+
+    - name: Download git
+      get_url:
+        url: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.9.5.tar.gz
+        dest: /opt/
+
+    - name: Untar git
+      unarchive:
+        src: "/opt/git-2.9.5.tar.gz"
+        remote_src: yes
+        dest: "/opt"
+
+    - name: Configure git
+      command: make configure
+      args:
+        chdir: "/opt/git-2.9.5/"
+
+    - name: Configure git 2
+      command: ./configure --prefix=/usr
+      args:
+        chdir: "/opt/git-2.9.5/"
+
+    - name: Make git
+      command: make all
+      args:
+        chdir: "/opt/git-2.9.5/"
+
+    - name: Git install
+      command: make install
+      args:
+        chdir: "/opt/git-2.9.5/"
+        
+    - name: Download cmake
+      get_url:
+        url: "https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz"
+        dest: /opt/
+        
+    - name: Untar cmake
+      unarchive:
+        src: "/opt/cmake-3.12.1.tar.gz"
+        remote_src: yes
+        dest: "/opt"
+
+    - name: Cmake bootstrap
+      command: ./bootstrap
+      args:
+        chdir: "/opt/cmake-3.12.1/"
+
+    - name: Cmake Build
+      command: make -j 4
+      args:
+        chdir: "/opt/cmake-3.12.1/"
+    
+    - name: cmake install
+      command: make install
+      args:
+        chdir: "/opt/cmake-3.12.1/"
+        
+    - name: Yum packages
+      yum:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - kernel-devel
+          - centos-release-scl
+          - java-1.8.0-openjdk-devel
+          - libunwind-devel
+          - htop
+
+    - name: Yum packages
+      yum:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - devtoolset-7
+          - devtoolset-7-perftools
+          - devtoolset-7-valgrind
+          
+    - name: upgrade all packages
+      yum:
+        name: '*'
+        state: latest
+        
+    - name: Clone cmake modules
+      git:
+        repo: https://github.com/rpavlik/cmake-modules.git
+        dest: /opt/cmake-modules
+
+    - name: Clone spdlog
+      git:
+        repo: https://github.com/gabime/spdlog.git
+        dest: /opt/spdlog
+        version: v1.1.0
+
+    - name: Make spdlog build dir
+      file:
+        path: "/opt/spdlog/build"
+        state: directory
+        mode: 0755
+
+    - name: spdlog Build
+      command: /usr/local/bin/cmake /opt/spdlog
+      args:
+        chdir: "/opt/spdlog/build"
+
+    - name: spdlog Build
+      command: make -j 4
+      args:
+        chdir: "/opt/spdlog/build"
+    
+    - name: spdlog install
+      command: make install
+      args:
+        chdir: "/opt/spdlog/build"
+
+    - name: Clone lvvm
+      git: 
+        repo: 'https://github.com/llvm-mirror/llvm.git'
+        dest: "{{ llvm_src_dir }}"
+        version: "{{ clang_release }}"
+        
+    - name: Clone clang     
+      git:
+        repo: 'https://github.com/llvm-mirror/clang.git'
+        dest: "{{ llvm_src_dir }}/tools/clang"
+        version: "{{ clang_release }}"
+        
+    - name: Clone clang tools extra
+      git:
+        repo: 'https://github.com/llvm-mirror/clang-tools-extra.git'
+        dest: "{{ llvm_src_dir }}/tools/clang/tools/extra"
+        version: "{{ clang_release }}"
+        
+    - name: Clone compiler-rt
+      git:
+        repo: 'https://github.com/llvm-mirror/compiler-rt.git'
+        dest: "{{ llvm_src_dir }}/projects/compiler-rt"
+        version: "{{ clang_release }}"
+        
+    - name: Make clang build dir
+      file:
+        path: "{{ clang_build_dir }}"
+        state: directory
+        mode: 0755
+
+    # -DLLVM_USE_LINKER=gold
+    - name: llvm CMake
+      command: /usr/local/bin/cmake -DCMAKE_BUILD_TYPE="{{ clang_build_type }}" -G "Unix Makefiles" "{{ llvm_src_dir }}" 
+      args:
+        chdir: "{{ clang_build_dir }}"
+
+    - name: llvm Build
+      command: make -j 4
+      args:
+        chdir: "{{ clang_build_dir }}"
+    
+    - name: llvm install
+      command: make install
+      args:
+        chdir: "{{ clang_build_dir }}"

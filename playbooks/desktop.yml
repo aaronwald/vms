@@ -1,0 +1,34 @@
+
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: no
+  vars:
+     ansible_python_interpreter: /usr/bin/python2.7
+     
+  tasks:
+    - name: Yum Desktop
+      yum:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - "@X Window System"
+          - "@GNOME Desktop"
+          - "@Graphical Administration Tools"
+          - code
+          - tmux
+          - firefox
+          - "@Xfce"
+          - google-droid-sans-mono-fonts
+	  - emacs
+          - emacs-el
+          - emacs-git
+          - emacs-yaml-mode
+
+    - name: Xfce For vagrant user
+      lineinfile:
+        path: /home/vagrant/.xinitrc
+        state: present
+        create: yes
+        line: "exec /usr/bin/xfce4-session"
