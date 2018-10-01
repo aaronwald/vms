@@ -3,7 +3,7 @@
         "user": "vagrant",
         "password": "vagrant",
         "disk_size": "20000",
-	"private_key": "{{env `PACKER_SSH_KEY`}}
+	"private_key": "{{env `PACKER_SSH_KEY`}}"
     },
 
     "builders":
