@@ -55,6 +55,8 @@
           - numactl
           - numactl-libs
           - numactl-devel
+          - luajit
+          - luajit-devel
 
     - name: Download git
       get_url:
