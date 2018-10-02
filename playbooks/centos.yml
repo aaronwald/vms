@@ -1,0 +1,101 @@
+
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: no
+  vars:
+     ansible_python_interpreter: /usr/bin/python2.7
+     llvm_src_dir: /opt/llvm
+     clang_release: release_70
+     clang_build_dir: /opt/clang-build
+     clang_build_type: Release
+     ansible_distribution_major_version: 7
+     cmake_src_dir: /opt/cmake
+     cmake_build_dir: /opt/cmake-build
+
+  tasks:
+    - name: Yum Development Tools
+      yum:
+        name: "@Development Tools"
+        state: present
+
+    - name: YUM ELRepo Key
+      command: "rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org"
+
+    - name: Yum ELRepo
+      yum:
+        name: "http://elrepo.org/linux/elrepo/el7/x86_64/RPMS/elrepo-release-7.0-3.el7.elrepo.noarch.rpm"
+        state: present
+
+    - name: Yum Epel
+      yum:
+        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+        state: present
+      
+    - name: Import EPEL GPG key.
+      rpm_key:
+        key: "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+        state: present
+
+    - name: Yum base packages
+      yum:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - gettext-devel
+          - openssl-devel
+          - perl-CPAN
+          - perl-devel
+          - zlib-devel
+          - libyaml-devel
+          - man-pages
+          - python36
+          - python-virtualenv
+          - numactl
+          - numactl-libs
+          - numactl-devel
+          - luajit
+          - luajit-devel
+          - kernel-devel
+          - centos-release-scl
+          - java-1.8.0-openjdk-devel
+          - libunwind-devel
+          - htop
+
+    - name: Yum devtoolset
+      yum:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - devtoolset-7
+          - devtoolset-7-perftools
+          - devtoolset-7-valgrind
+          
+    - name: Yum kernel-ml packages
+      yum:
+        name: "{{ packages }}"
+        state: latest
+        disablerepo: "*"
+        enablerepo: "elrepo-kernel"
+      vars:
+        packages:
+          - kernel-ml
+          - kernel-ml-devel
+          
+          
+    - name: upgrade all packages
+      yum:
+        name: '*'
+        state: latest
+
+    - name: set default boot to 0 
+      lineinfile:
+        regexp: ^GRUB_DEFAULT=
+        line: GRUB_DEFAULT="0"
+        dest: /etc/default/grub
+        state: present
+    
+    - name: Upgrade grub config
+      command: grub2-mkconfig -o /boot/grub2/grub.cfg

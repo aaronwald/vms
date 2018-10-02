@@ -3,45 +3,49 @@
     "_comment" : "https://aws.amazon.com/marketplace/pp/B00O7WM7QW?qid=1535147837118&sr=0-1&ref_=srh_res_product_title"
     "builders":
     [
-	{
-	    "type": "amazon-ebs",
-	    "ami_name": "CentOS Linux 7 x86_64 HVM EBS (encrypted) {{isotime \"20060102\"}}",
-	    "ami_description": "CentOS Linux 7 x86_64 HVM EBS (encrypted) {{isotime \"20060102\"}}",
-	    "ami_virtualization_type": "hvm",
-	    "associate_public_ip_address": true,
-	    "tags": {
+		  {
+				"type": "amazon-ebs",
+				"ami_name": "CentOS Linux 7 x86_64 HVM EBS (encrypted) {{isotime \"20060102\"}}",
+				"ami_description": "CentOS Linux 7 x86_64 HVM EBS (encrypted) {{isotime \"20060102\"}}",
+				"ami_virtualization_type": "hvm",
+				"associate_public_ip_address": true,
+				"tags": {
                 "Name": "CentOS 7",
                 "OS": "CentOS",
                 "OSVER": "7"
             },
-	    "access_key": "{{user `AWS_ACCESS_KEY`}}",
-	    "secret_key": "{{user `AWS_SECRET_KEY`}}",
-	    "region": "us-west-1",
-	    "source_ami_filter": {
-		"filters": {
-		    "virtualization-type": "hvm",
-		    "product-code": "aw0evgkw8e5c1q413zgy5pjce",
-		    "root-device-type": "ebs",
-		    "owner-alias": "aws-marketplace"
-		},
-		"most_recent": true
-	    },
-	    "instance_type": "m4.xlarge",
-	    "ssh_username": "centos",
-	    "ami_name": "packer-quick-start {{timestamp}}",
-	    "communicator": "ssh",
+				"access_key": "{{user `AWS_ACCESS_KEY`}}",
+				"secret_key": "{{user `AWS_SECRET_KEY`}}",
+				"region": "us-west-1",
+				"source_ami_filter": {
+					 "filters": {
+						  "virtualization-type": "hvm",
+						  "product-code": "aw0evgkw8e5c1q413zgy5pjce",
+						  "root-device-type": "ebs",
+						  "owner-alias": "aws-marketplace"
+					 },
+					 "most_recent": true
+				},
+				"instance_type": "m4.xlarge",
+				"ssh_username": "centos",
+				"ami_name": "packer-quick-start {{timestamp}}",
+				"communicator": "ssh",
             "ssh_pty": true
-	}
+		  }
     ],
-
+	 
     "_provisioners": [
-	{
-	    "type" : "ansible",
-	    "playbook_file" : "clang/llvm.yml"
-	},
-	{
-	    "type" : "ansible",
-	    "playbook_file" : "clang/gbits.yml"
-	}
+		  {
+				"type" : "ansible",
+				"playbook_file" : "playbooks/centos.yml"
+		  },
+		  {
+				"type" : "ansible",
+				"playbook_file" : "playbooks/llvm.yml"
+		  },
+		  {
+				"type" : "ansible",
+				"playbook_file" : "playbooks/gbits.yml"
+		  }
     ]
 }

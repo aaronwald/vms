@@ -54,11 +54,19 @@
 		  },
 		  {
 				"type" : "ansible-local",
+				"playbook_file" : "playbooks/centos.yml"
+		  },
+		  {
+				"type" : "ansible-local",
 				"playbook_file" : "playbooks/llvm.yml"
 		  },
 		  {
 				"type" : "ansible-local",
 				"playbook_file" : "playbooks/gbits.yml"
+		  },
+		  {
+				"type" : "ansible-local",
+				"playbook_file" : "playbooks/bcc.yml"
 		  },
 		  {
 				"type" : "ansible-local",

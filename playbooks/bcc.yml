@@ -1,0 +1,37 @@
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: no
+  vars:
+     ansible_python_interpreter: /usr/bin/python2.7
+     bits_dir: "/tmp/bits"
+     bcc_git_url: https://github.com/iovisor/bcc.git
+     bcc_version: v0.7.0
+
+  tasks:
+    - name: Clone bcc
+      git:
+        repo: "{{ bcc_git_url }}"
+        dest: "{{ bits_dir }}/bcc"
+        version: "{{ bcc_version }}"
+
+    - name: Make bcc build
+      file:
+        path: "{{ bits_dir }}/bcc/build"
+        state: directory
+        mode: 0755
+
+    - name: bcc cmake
+      command: /usr/local/bin/cmake "{{ bits_dir }}/bcc" -DCMAKE_INSTALL_PREFIX=/usr
+      args:
+        chdir: "{{ bits_dir }}/bcc/build"
+
+    - name: bcc build
+      command: make -j 4
+      args:
+        chdir: "{{ bits_dir }}/bcc/build"
+
+    - name: bcc install
+      command: make install
+      args:
+        chdir: "{{ bits_dir }}/bcc/build"

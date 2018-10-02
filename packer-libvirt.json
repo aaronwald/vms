@@ -3,7 +3,7 @@
         "user": "vagrant",
         "password": "vagrant",
         "disk_size": "20000",
-	"private_key": "{{env `PACKER_SSH_KEY`}}"
+		  "private_key": "{{env `PACKER_SSH_KEY`}}"
     },
 
     "builders":
@@ -56,11 +56,19 @@
 		  },
 		  {
 				"type" : "ansible",
+				"playbook_file" : "playbooks/centos.yml"
+		  },
+		  {
+				"type" : "ansible",
 				"playbook_file" : "playbooks/llvm.yml"
 		  },
 		  {
 				"type" : "ansible",
 				"playbook_file" : "playbooks/gbits.yml"
+		  },
+		  {
+				"type" : "ansible",
+				"playbook_file" : "playbooks/bcc.yml"
 		  },
 		  {
 				"type" : "shell",
@@ -77,6 +85,4 @@
 				}
 		  ]
 	 ]
-
-
 }
