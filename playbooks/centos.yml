@@ -62,6 +62,9 @@
           - java-1.8.0-openjdk-devel
           - libunwind-devel
           - htop
+          - elfutils-libelf-devel
+          - http://repo.iovisor.org/yum/extra/mageia/cauldron/x86_64/netperf-2.7.0-1.mga6.x86_64.rpm
+          - iperf
 
     - name: Yum devtoolset
       yum:
@@ -83,7 +86,6 @@
         packages:
           - kernel-ml
           - kernel-ml-devel
-          
           
     - name: upgrade all packages
       yum:
