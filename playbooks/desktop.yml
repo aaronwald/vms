@@ -21,7 +21,7 @@
           - firefox
           - "@Xfce"
           - google-droid-sans-mono-fonts
-	  - emacs
+          - emacs
           - emacs-el
           - emacs-git
           - emacs-yaml-mode
