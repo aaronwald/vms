@@ -60,6 +60,10 @@
 		  },
 		  {
 				"type" : "ansible",
+				"playbook_file" : "playbooks/devtools.yml"
+		  },
+		  {
+				"type" : "ansible",
 				"playbook_file" : "playbooks/llvm.yml"
 		  },
 		  {

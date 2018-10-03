@@ -58,6 +58,10 @@
 		  },
 		  {
 				"type" : "ansible-local",
+				"playbook_file" : "playbooks/devtools.yml"
+		  },
+		  {
+				"type" : "ansible-local",
 				"playbook_file" : "playbooks/llvm.yml"
 		  },
 		  {

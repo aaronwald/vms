@@ -1,0 +1,101 @@
+
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: no
+  vars:
+     ansible_python_interpreter: /usr/bin/python2.7
+     ansible_distribution_major_version: 7
+     cmake_src_dir: /opt/cmake
+     cmake_build_dir: /opt/cmake-build
+
+  tasks:
+    - name: Download git
+      get_url:
+        url: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.9.5.tar.gz
+        dest: /opt/
+
+    - name: Untar git
+      unarchive:
+        src: "/opt/git-2.9.5.tar.gz"
+        remote_src: yes
+        dest: "/opt"
+
+    - name: Configure git
+      command: make configure
+      args:
+        chdir: "/opt/git-2.9.5/"
+
+    - name: Configure git 2
+      command: ./configure --prefix=/usr
+      args:
+        chdir: "/opt/git-2.9.5/"
+
+    - name: Make git
+      command: make all
+      args:
+        chdir: "/opt/git-2.9.5/"
+
+    - name: Git install
+      command: make install
+      args:
+        chdir: "/opt/git-2.9.5/"
+        
+    - name: Download cmake
+      get_url:
+        url: "https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz"
+        dest: /opt/
+        
+    - name: Untar cmake
+      unarchive:
+        src: "/opt/cmake-3.12.1.tar.gz"
+        remote_src: yes
+        dest: "/opt"
+
+    - name: Cmake bootstrap
+      command: ./bootstrap
+      args:
+        chdir: "/opt/cmake-3.12.1/"
+
+    - name: Cmake Build
+      command: make -j 4
+      args:
+        chdir: "/opt/cmake-3.12.1/"
+    
+    - name: cmake install
+      command: make install
+      args:
+        chdir: "/opt/cmake-3.12.1/"
+        
+        
+    - name: Clone cmake modules
+      git:
+        repo: https://github.com/rpavlik/cmake-modules.git
+        dest: /opt/cmake-modules
+
+    - name: Clone spdlog
+      git:
+        repo: https://github.com/gabime/spdlog.git
+        dest: /opt/spdlog
+        version: v1.1.0
+
+    - name: Make spdlog build dir
+      file:
+        path: "/opt/spdlog/build"
+        state: directory
+        mode: 0755
+
+    - name: spdlog Build
+      command: /usr/local/bin/cmake /opt/spdlog
+      args:
+        chdir: "/opt/spdlog/build"
+
+    - name: spdlog Build
+      command: make -j 4
+      args:
+        chdir: "/opt/spdlog/build"
+    
+    - name: spdlog install
+      command: make install
+      args:
+        chdir: "/opt/spdlog/build"
