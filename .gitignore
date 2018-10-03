@@ -1,1 +1,4 @@
 *~
+*.retry
+builds
+packer_cache

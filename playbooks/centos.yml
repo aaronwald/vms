@@ -57,7 +57,6 @@
           - numactl-devel
           - luajit
           - luajit-devel
-          - kernel-devel
           - centos-release-scl
           - java-1.8.0-openjdk-devel
           - libunwind-devel
@@ -65,6 +64,12 @@
           - elfutils-libelf-devel
           - http://repo.iovisor.org/yum/extra/mageia/cauldron/x86_64/netperf-2.7.0-1.mga6.x86_64.rpm
           - iperf
+          - emacs
+
+    - name: upgrade all packages
+      yum:
+        name: '*'
+        state: latest
 
     - name: Yum devtoolset
       yum:
@@ -75,6 +80,16 @@
           - devtoolset-7
           - devtoolset-7-perftools
           - devtoolset-7-valgrind
+
+    - name: Yum base packages
+      yum:
+        name: "{{ packages }}"
+        state: absent
+      vars:
+        packages:
+          - kernel-tools-libs
+          - kernel-tools
+          - kernel-devel
           
     - name: Yum kernel-ml packages
       yum:
@@ -86,12 +101,11 @@
         packages:
           - kernel-ml
           - kernel-ml-devel
-          
-    - name: upgrade all packages
-      yum:
-        name: '*'
-        state: latest
+          - kernel-ml-tools
 
+    - name: Swap kernel-headers
+      command: yum --enablerepo=elrepo-kernel -y swap kernel-headers -- kernel-ml-headers
+          
     - name: set default boot to 0 
       lineinfile:
         regexp: ^GRUB_DEFAULT=
