@@ -3,7 +3,7 @@
 echo 'Cleanup source'
 sudo rm -rf /tmp/bits
 sudo rm -rf /opt/llvm
-sudo rm -rf /opt/cmake*
+sudo rm -rf /opt/cmake-build
 sudo rm -rf /opt/clang-build
 sudo rm -rf /opt/git*
 sudo rm -rf /opt/spd*
