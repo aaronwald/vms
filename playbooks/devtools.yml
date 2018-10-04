@@ -8,64 +8,67 @@
      ansible_distribution_major_version: 7
      cmake_src_dir: /opt/cmake
      cmake_build_dir: /opt/cmake-build
-
+     git_version: 2.9.5
+     cmake_version: 3.12.1
+     spdlog_version: v1.1.0
+     
   tasks:
     - name: Download git
       get_url:
-        url: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.9.5.tar.gz
+        url: "https://mirrors.edge.kernel.org/pub/software/scm/git/git-{{ git_version }}.tar.gz"
         dest: /opt/
 
     - name: Untar git
       unarchive:
-        src: "/opt/git-2.9.5.tar.gz"
+        src: "/opt/git-{{ git_version }}.tar.gz"
         remote_src: yes
         dest: "/opt"
 
     - name: Configure git
       command: make configure
       args:
-        chdir: "/opt/git-2.9.5/"
+        chdir: "/opt/git-{{ git_version }}/"
 
     - name: Configure git 2
       command: ./configure --prefix=/usr
       args:
-        chdir: "/opt/git-2.9.5/"
+        chdir: "/opt/git-{{ git_version }}/"
 
     - name: Make git
       command: make all
       args:
-        chdir: "/opt/git-2.9.5/"
+        chdir: "/opt/git-{{ git_version }}/"
 
     - name: Git install
       command: make install
       args:
-        chdir: "/opt/git-2.9.5/"
+        chdir: "/opt/git-{{ git_version }}/"
         
     - name: Download cmake
       get_url:
-        url: "https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz"
+        url: "https://cmake.org/files/v3.12/cmake-{{ cmake_version }}.tar.gz"
         dest: /opt/
         
     - name: Untar cmake
       unarchive:
-        src: "/opt/cmake-3.12.1.tar.gz"
+        src: "/opt/cmake-{{ cmake_version }}.tar.gz"
         remote_src: yes
         dest: "/opt"
 
     - name: Cmake bootstrap
       command: ./bootstrap
       args:
-        chdir: "/opt/cmake-3.12.1/"
+        chdir: "/opt/cmake-{{ cmake_version }}/"
 
     - name: Cmake Build
       command: make -j 4
       args:
-        chdir: "/opt/cmake-3.12.1/"
+        chdir: "/opt/cmake-{{ cmake_version }}/"
     
     - name: cmake install
       command: make install
       args:
-        chdir: "/opt/cmake-3.12.1/"
+        chdir: "/opt/cmake-{{ cmake_version }}/"
         
         
     - name: Clone cmake modules
@@ -77,7 +80,7 @@
       git:
         repo: https://github.com/gabime/spdlog.git
         dest: /opt/spdlog
-        version: v1.1.0
+        version: "{{ spdlog_version }}"
 
     - name: Make spdlog build dir
       file:
