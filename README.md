@@ -1,7 +1,5 @@
 
-# packer 
-
-## debug
+## packer 
 
 ```sh
 export PACKER_SSH_KEY=/home/foo/bar/id_rsa.pub
@@ -9,7 +7,7 @@ packer build -on-error=ask packer-virtualbox.json
 vagrant box add foo builds/libvirt-centos7.box
 ```
 
-### vagrant
+## vagrant
 
 ```ruby
 
