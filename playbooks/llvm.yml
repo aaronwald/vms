@@ -10,6 +10,7 @@
      clang_release: release_39
      clang_build_dir: /opt/clang-build
      clang_build_type: Release
+     install_prefix: /usr
 
   tasks:
     - name: Clone lvvm
@@ -35,6 +36,18 @@
         repo: 'https://github.com/llvm-mirror/compiler-rt.git'
         dest: "{{ llvm_src_dir }}/projects/compiler-rt"
         version: "{{ clang_release }}"
+
+    - name: Clone libcxx
+      git:
+        repo: 'https://github.com/llvm-mirror/libcxx.git'
+        dest: "{{ llvm_src_dir }}/projects/libcxx"
+        version: "{{ clang_release }}"
+
+    - name: Clone libcxxabi
+      git:
+        repo: 'https://github.com/llvm-mirror/libcxxabi.git'
+        dest: "{{ llvm_src_dir }}/projects/libcxxabi"
+        version: "{{ clang_release }}"
         
     - name: Make clang build dir
       file:
@@ -44,7 +57,7 @@
 
     # -DLLVM_USE_LINKER=gold
     - name: llvm CMake
-      command: /usr/local/bin/cmake -DCMAKE_BUILD_TYPE="{{ clang_build_type }}" -G "Unix Makefiles" "{{ llvm_src_dir }}" 
+      command: /usr/local/bin/cmake -DCMAKE_BUILD_TYPE="{{ clang_build_type }}" -DCMAKE_INSTALL_PREFIX="{{ install_prefix }}" -G "Unix Makefiles" "{{ llvm_src_dir }}" 
       args:
         chdir: "{{ clang_build_dir }}"
 
@@ -52,8 +65,18 @@
       command: make -j 4
       args:
         chdir: "{{ clang_build_dir }}"
+
+    - name: llvm Build cxx
+      command: make -j 4 cxx
+      args:
+        chdir: "{{ clang_build_dir }}"
     
     - name: llvm install
       command: make install
+      args:
+        chdir: "{{ clang_build_dir }}"
+
+    - name: llvm install cxx
+      command: make install-cxx install-cxxabi
       args:
         chdir: "{{ clang_build_dir }}"
