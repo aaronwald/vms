@@ -25,8 +25,9 @@
         state: directory
         mode: 0755
 
-    - name: gflags cmake
-      command: /usr/local/bin/cmake "{{ bits_dir }}/gflags"
+    - name: gflags cmake 
+      command: /usr/local/bin/cmake "{{ bits_dir }}/gflags" -DCMAKE_CXX_COMPILER="clang++" -DCMAKE_CXX_FLAGS="-std=c++14 -stdlib=libc++ -lc++abi" -DCMAKE_EXE_LINKER_FLAGS="-lc++abi"
+
       args:
         chdir: "{{ bits_dir }}/gflags/build"
 
@@ -53,7 +54,7 @@
         mode: 0755
 
     - name: glog cmake
-      command: /usr/local/bin/cmake "{{ bits_dir }}/glog"
+      command: /usr/local/bin/cmake "{{ bits_dir }}/glog" -DCMAKE_CXX_COMPILER="clang++" -DCMAKE_CXX_FLAGS="-std=c++14 -stdlib=libc++ -lc++abi" -DCMAKE_EXE_LINKER_FLAGS="-lc++abi"
       args:
         chdir: "{{ bits_dir }}/glog/build"
 
@@ -80,7 +81,7 @@
         mode: 0755
 
     - name: gtest cmake
-      command: /usr/local/bin/cmake "{{ bits_dir }}/gtest"
+      command: /usr/local/bin/cmake "{{ bits_dir }}/gtest" -DCMAKE_CXX_COMPILER="clang++" -DCMAKE_CXX_FLAGS="-nodefaultlibs -std=c++14 -stdlib=libc++ -lc++abi" -DCMAKE_EXE_LINKER_FLAGS="-lc++abi"
       args:
         chdir: "{{ bits_dir }}/gtest/build"
 

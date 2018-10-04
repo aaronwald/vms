@@ -57,7 +57,7 @@
 
     # -DLLVM_USE_LINKER=gold
     - name: llvm CMake
-      command: /usr/local/bin/cmake -DCMAKE_BUILD_TYPE="{{ clang_build_type }}" -DCMAKE_INSTALL_PREFIX="{{ install_prefix }}" -G "Unix Makefiles" "{{ llvm_src_dir }}" 
+      command: /usr/local/bin/cmake -DCMAKE_BUILD_TYPE="{{ clang_build_type }}" -G "Unix Makefiles" "{{ llvm_src_dir }}" 
       args:
         chdir: "{{ clang_build_dir }}"
 
@@ -76,7 +76,12 @@
       args:
         chdir: "{{ clang_build_dir }}"
 
-    - name: llvm install cxx
-      command: make install-cxx install-cxxabi
+    - name: llvm install - libcxx
+      command: make install
       args:
-        chdir: "{{ clang_build_dir }}"
+        chdir: "{{ clang_build_dir }}/projects/libcxx"
+        
+    - name: llvm install - libcxxabi
+      command: make install
+      args:
+        chdir: "{{ clang_build_dir }}/projects/libcxxabi"
