@@ -81,7 +81,7 @@
         mode: 0755
 
     - name: gtest cmake
-      command: /usr/local/bin/cmake "{{ bits_dir }}/gtest" -DCMAKE_CXX_COMPILER="/usr/local/bin/clang++" -DCMAKE_CXX_FLAGS="-nodefaultlibs -std=c++14 -stdlib=libc++ -lc++abi" -DCMAKE_EXE_LINKER_FLAGS="-lc++abi"
+      command: /usr/local/bin/cmake "{{ bits_dir }}/gtest" -DCMAKE_CXX_COMPILER="/usr/local/bin/clang++" -DCMAKE_CXX_FLAGS="-std=c++14 -stdlib=libc++ -lc++abi" -DCMAKE_EXE_LINKER_FLAGS="-lc++abi"
       args:
         chdir: "{{ bits_dir }}/gtest/build"
 
