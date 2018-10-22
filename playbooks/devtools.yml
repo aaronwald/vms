@@ -11,7 +11,8 @@
      git_version: 2.9.5
      cmake_version: 3.12.1
      spdlog_version: v1.1.0
-     
+     json_version: v3.3.0
+
   tasks:
     - name: Download git
       get_url:
@@ -102,3 +103,30 @@
       command: make install
       args:
         chdir: "/opt/spdlog/build"
+
+    - name: Clone json
+      git:
+        repo: https://github.com/nlohmann/json.git
+        dest: /opt/json
+        version: "{{ json_version }}"
+
+    - name: Make json build dir
+      file:
+        path: "/opt/json/build"
+        state: directory
+        mode: 0755
+
+    - name: json Build
+      command: /usr/local/bin/cmake /opt/json
+      args:
+        chdir: "/opt/json/build"
+
+    - name: json Build
+      command: make -j 4
+      args:
+        chdir: "/opt/json/build"
+
+    - name: json install
+      command: make install
+      args:
+        chdir: "/opt/json/build"
