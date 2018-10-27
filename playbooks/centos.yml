@@ -68,6 +68,7 @@
           - libcxx-devel
           - perf
           - npm
+          - wget
 
     - name: upgrade all packages
       yum:
