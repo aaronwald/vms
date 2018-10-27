@@ -66,6 +66,8 @@
           - iperf
           - emacs
           - libcxx-devel
+          - perf
+          - npm
 
     - name: upgrade all packages
       yum:
