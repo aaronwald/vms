@@ -7,7 +7,7 @@
      ansible_python_interpreter: /usr/bin/python2.7
      ansible_distribution_major_version: 7
      llvm_src_dir: /opt/llvm
-     clang_release: release_60
+     clang_release: release_70
      clang_build_dir: /opt/clang-build
      clang_build_type: Release
      install_prefix: /usr
@@ -57,7 +57,7 @@
 
     # -DLLVM_USE_LINKER=gold
     - name: llvm CMake
-      command: /usr/local/bin/cmake -DCMAKE_BUILD_TYPE="{{ clang_build_type }}" -G "Unix Makefiles" "{{ llvm_src_dir }}" 
+      command: /usr/local/bin/cmake -DCMAKE_BUILD_TYPE="{{ clang_build_type }}" -G "Unix Makefiles" "{{ llvm_src_dir }}" -DLLVM_BUILD_LLVM_DYLIB=ON -DLLVM_ENABLE_RTTI=ON
       args:
         chdir: "{{ clang_build_dir }}"
 

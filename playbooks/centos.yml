@@ -84,6 +84,7 @@
           - devtoolset-7
           - devtoolset-7-perftools
           - devtoolset-7-valgrind
+          - devtoolset-7-llvm
 
     - name: Yum base packages
       yum:
