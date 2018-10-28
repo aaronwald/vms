@@ -9,9 +9,6 @@
     bcc_version: v0.7.0
     bpf_git_url: https://github.com/iovisor/bpftrace
     bpf_version: master
-#  environment:
-#    CC: /usr/local/bin/clang
-#    CXX: /usr/local/bin/clang++
 
   tasks:
     - name: Clone bcc
@@ -58,12 +55,12 @@
       args:
         chdir: "{{ bits_dir }}/bpf/build"
 
-#    - name: bpf build
-#      command: scl enable devtoolset-7 'make -j 4'
-#      args:
-#        chdir: "{{ bits_dir }}/bpf/build"
+    - name: bpf build
+      command: scl enable devtoolset-7 'make -j 4'
+      args:
+        chdir: "{{ bits_dir }}/bpf/build"
 
-#    - name: bpf install
-#      command: make install
-#      args:
-#        chdir: "{{ bits_dir }}/bpf/build"
+    - name: bpf install
+      command: scl enable devtoolset-7 'make install'
+      args:
+        chdir: "{{ bits_dir }}/bpf/build"

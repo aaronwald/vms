@@ -1,3 +1,11 @@
+# Intro
+
+Ansible playbooks to build
+
+ * [LLVM](https://llvm.org/)
+ * [bpftrace](https://github.com/iovisor/bpftrace)
+ * [Google Test](https://github.com/google/googletest)
+ * [GFlags](https://github.com/gflags/gflags)
 
 ## packer 
 
