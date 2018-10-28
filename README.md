@@ -23,7 +23,7 @@ vagrant box add foo builds/libvirt-centos7.box
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "foot9"
+  config.vm.box = "foo"
   config.ssh.private_key_path = "/home/foo/bar/id_rsa"
 end
 
