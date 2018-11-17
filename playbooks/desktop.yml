@@ -21,10 +21,10 @@
           - firefox
           - "@Xfce"
           - google-droid-sans-mono-fonts
-          - emacs
-          - emacs-el
-          - emacs-git
-          - emacs-yaml-mode
+#          - emacs
+#          - emacs-el
+#          - emacs-git
+#          - emacs-yaml-mode
 
     - name: Xfce For vagrant user
       lineinfile:
