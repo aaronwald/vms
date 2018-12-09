@@ -64,7 +64,7 @@
           - elfutils-libelf-devel
           - http://repo.iovisor.org/yum/extra/mageia/cauldron/x86_64/netperf-2.7.0-1.mga6.x86_64.rpm
           - iperf
-          - kmod-nvidia-390.87-1.el7_5.elrepo
+#          - kmod-nvidia-390.87-1.el7_5.elrepo
           - emacs
           - libcxx-devel
           - perf
@@ -87,15 +87,15 @@
           - devtoolset-7-valgrind
           - devtoolset-7-llvm
 
-#    - name: Yum base packages
-#      yum:
-#        name: "{{ packages }}"
-#        state: absent
-#      vars:
-#        packages:
-#          - kernel-tools-libs
-#          - kernel-tools
-#          - kernel-devel
+    - name: Yum base packages
+      yum:
+        name: "{{ packages }}"
+        state: absent
+      vars:
+        packages:
+          - kernel-tools-libs
+          - kernel-tools
+          - kernel-devel
           
     - name: Yum kernel-ml packages
       yum:
