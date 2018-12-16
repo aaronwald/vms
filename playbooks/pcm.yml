@@ -1,0 +1,29 @@
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/bin/python2.7
+    bits_dir: "/opt"
+    pcm_git_url: https://github.com/opcm/pcm.git
+    pcm_version: 201812
+
+  tasks:
+    - name: Clone pcm
+      git:
+        repo: "{{ pcm_git_url }}"
+        dest: "{{ bits_dir }}/pcm"
+        version: "{{ pcm_version }}"
+
+    - name: Make pcm build
+      file:
+        path: "{{ bits_dir }}/pcm/build"
+        state: directory
+        mode: 0755
+
+
+    - name: pcm build
+      command: make 
+      args:
+        chdir: "{{ bits_dir }}/pcm/"
+

@@ -75,6 +75,10 @@
 				"playbook_file" : "playbooks/bcc.yml"
 		  },
 		  {
+				"type" : "ansible",
+				"playbook_file" : "playbooks/pcm.yml"
+		  },
+		  {
 				"type" : "shell",
 				"script": "scripts/vagrant-prepare.sh"
 		  }

@@ -74,6 +74,10 @@
 		  },
 		  {
 				"type" : "ansible-local",
+				"playbook_file" : "playbooks/pcm.yml"
+		  },
+		  {
+				"type" : "ansible-local",
 				"playbook_file" : "playbooks/desktop.yml"
 		  },
 		  {
