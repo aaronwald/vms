@@ -1,0 +1,65 @@
+
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: no
+  vars:
+     ansible_python_interpreter: /usr/bin/python2.7
+
+ tasks:
+   - name: Upgrade all packages to the latest version
+     apt:
+       name: "*"
+       state: latest
+
+  - name: Update all packages to the latest version
+    apt:
+      upgrade: dist
+
+  - name: Install a list of packages
+    apt:
+      name: "{{ packages }}"
+      vars:
+        packages:
+          - build-essential
+          - libtool
+          - asciidoc 
+          - tmux
+          - libkmod-dev
+          - pkg-config-i686-linux-gnu
+          - libudev-dev
+          - libudev1
+          - uuid
+          - uuid-dev
+          - libjson-c-dev
+          - nvme-cli
+          - libunwind-dev
+          - emacs-goodies-el
+          - vagrant
+          - packer
+          - ansible
+          - python-dev
+          - qemu-kvm
+          - libvirt-bin
+          - ubuntu-vm-builder
+          - bridge-utils
+          - virtualenv
+          - yaml-mode
+          - autoconf
+          - autoconf-doc
+          - zlib1g-dev
+          - zsh
+          - zsh-doc
+          - libcurl4-openssl-dev
+          - bison bison-doc
+          - flex
+          - libelf-dev
+          - iperf3
+          - netperf
+          - arping
+          - libyaml-dev
+          - libssl-doc
+          - libssl-dev
+          - libnuma-dev
+          - libfl-dev
+ 
