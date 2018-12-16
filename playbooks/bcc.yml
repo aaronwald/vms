@@ -1,7 +1,7 @@
 - hosts: all
   become: true
   become_user: root
-  gather_facts: no
+  gather_facts: yes
   vars:
     ansible_python_interpreter: /usr/bin/python2.7
     bits_dir: "/tmp/bits"
@@ -50,17 +50,38 @@
         state: directory
         mode: 0755
 
-    - name: bpf cmake
+    - name: bpf cmake centos
       command: scl enable devtoolset-7 '/usr/local/bin/cmake "{{ bits_dir }}/bpf" -DCMAKE_BUILD_TYPE=DEBUG ..'
       args:
         chdir: "{{ bits_dir }}/bpf/build"
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
-    - name: bpf build
+    - name: bpf cmake ubuntu
+      command: '/usr/local/bin/cmake "{{ bits_dir }}/bpf" -DCMAKE_BUILD_TYPE=DEBUG ..'
+      args:
+        chdir: "{{ bits_dir }}/bpf/build"
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: bpf build centos
       command: scl enable devtoolset-7 'make -j 4'
       args:
         chdir: "{{ bits_dir }}/bpf/build"
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
-    - name: bpf install
+    - name: bpf build ubuntu
+      command: 'make -j 4'
+      args:
+        chdir: "{{ bits_dir }}/bpf/build"
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+      
+    - name: bpf install centos
       command: scl enable devtoolset-7 'make install'
       args:
         chdir: "{{ bits_dir }}/bpf/build"
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+    - name: bpf install ubuntu
+      command: 'make install'
+      args:
+        chdir: "{{ bits_dir }}/bpf/build"
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
