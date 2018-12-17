@@ -5,20 +5,26 @@
   gather_facts: no
   vars:
      ansible_python_interpreter: /usr/bin/python2.7
+     
+  tasks:
+    - name: Aptitude
+      apt:
+        name: aptitude 
+        state: latest
+    
+    - name: Upgrade all packages to the latest version
+      apt:
+        name: "*"
+        state: latest
 
- tasks:
-   - name: Upgrade all packages to the latest version
-     apt:
-       name: "*"
-       state: latest
+    - name: Update all packages to the latest version
+      apt:
+        upgrade: dist
 
-  - name: Update all packages to the latest version
-    apt:
-      upgrade: dist
-
-  - name: Install a list of packages
-    apt:
-      name: "{{ packages }}"
+    - name: Install a list of packages
+      apt:
+        name: "{{ packages }}"
+        state: latest
       vars:
         packages:
           - build-essential
@@ -51,7 +57,8 @@
           - zsh
           - zsh-doc
           - libcurl4-openssl-dev
-          - bison bison-doc
+          - bison
+          - bison-doc
           - flex
           - libelf-dev
           - iperf3
@@ -62,4 +69,5 @@
           - libssl-dev
           - libnuma-dev
           - libfl-dev
- 
+          - linux-tools-common
+          - linux-tools-generic
