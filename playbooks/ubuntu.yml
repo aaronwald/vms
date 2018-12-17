@@ -72,4 +72,5 @@
           - linux-tools-common
           - linux-tools-generic
           - msr-tools
+          - iftop
           
