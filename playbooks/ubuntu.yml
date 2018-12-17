@@ -71,3 +71,5 @@
           - libfl-dev
           - linux-tools-common
           - linux-tools-generic
+          - msr-tools
+          
