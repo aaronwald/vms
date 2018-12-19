@@ -1,0 +1,59 @@
+
+- hosts: all
+  gather_facts: yes
+     
+  tasks:
+    - name: Create a network
+      docker_network:
+        name: coypu_net
+
+    - name: Coypu hello
+      docker_container:
+        name: coypu-h1
+        image: coypu:hello
+        detach: yes
+        networks:
+          - name: coypu_net
+        purge_networks: yes
+
+    - name: Zookeeper
+      docker_container:
+        name: zookeeper
+        image: jplock/zookeeper
+        ports:
+          - "2181:2181"
+        networks:
+          - name: coypu_net
+        purge_networks: yes
+        detach: yes
+
+    - name: Kafka
+      docker_container:
+        name: kafka
+        image: ches/kafka
+        networks:
+          - name: coypu_net
+        purge_networks: yes
+        detach: yes
+        ports:
+          - "7203:7203"
+          - "9092:9092"
+        env:
+          ZOOKEEPER_IP: zookeeper
+      
+    - name: Create postgres
+      docker_container:
+        name: pg-docker
+        image: postgres:latest
+        detach: yes
+        networks:
+          - name: coypu_net
+        purge_networks: yes
+        ports:
+          - "5432:5432"
+        volumes:
+          - "{{ansible_env.HOME}}/docker/volumes/postgres:/var/lib/postgresql/data"
+        env:
+          POSTGRES_PASSWORD: docker
+
+          
