@@ -15,6 +15,7 @@
         networks:
           - name: coypu_net
         purge_networks: yes
+        auto_remove: yes
 
     - name: Zookeeper
       docker_container:
@@ -26,26 +27,31 @@
           - name: coypu_net
         purge_networks: yes
         detach: yes
-
+        auto_remove: yes
+        
     - name: Kafka
       docker_container:
         name: kafka
+        hostname: coypu-kafka
         image: ches/kafka
         networks:
           - name: coypu_net
         purge_networks: yes
         detach: yes
+        auto_remove: yes
         ports:
           - "7203:7203"
           - "9092:9092"
         env:
           ZOOKEEPER_IP: zookeeper
       
-    - name: Create postgres
+    - name: Postgres
       docker_container:
-        name: pg-docker
+        name: postgres
+        hostname: coypu-postgres
         image: postgres:latest
         detach: yes
+        auto_remove: yes
         networks:
           - name: coypu_net
         purge_networks: yes
