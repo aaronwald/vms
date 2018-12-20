@@ -28,3 +28,8 @@ Vagrant.configure("2") do |config|
 end
 
 ```
+
+## Docker
+```
+docker build -t coypu_llvm .
+````

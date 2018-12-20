@@ -1,0 +1,40 @@
+
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: no
+  vars:
+     ansible_python_interpreter: /usr/bin/python2.7
+     
+  tasks:
+    - name: Remove docker.io
+      apt:
+        state: absent
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - docker
+          - docker-engine
+          - docker.io
+
+    - name: Add an Apt signing key, will not download if present
+      apt_key:
+        id: 0EBFCD88
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: Apt update
+      apt:
+        update_cache: yes
+
+    - name: Install docker-ce
+      apt:
+        state: present
+        name: docker-ce
+
+#    - name: Usermod docker
+#      command: usermod -aG docker ${USER}
