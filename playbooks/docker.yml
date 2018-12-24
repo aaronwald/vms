@@ -44,18 +44,19 @@
         state: present
         name: docker-ce
 
-
     - name: Install kubectl
       apt:
         state: present
         name: kubectl
 
-    - get_url:
+    - name: Install minikube
+      get_url:
         url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
         dest: /usr/local/bin/minikube
         mode: 0777
 
-    - get_url:
+    - name: Install kvm2 driver
+      get_url:
         url: https://storage.googleapis.com/minikube/releases/latest/docker-machine-driver-kvm2
         dest: /usr/local/bin/
         mode: 0777
@@ -63,4 +64,3 @@
 #    - name: Usermod docker
 #      command: usermod -aG docker ${USER}
 
- 
