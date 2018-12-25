@@ -50,7 +50,6 @@
     - name: Postgres
       docker_container:
         name: postgres
-        hostname: coypu-postgres
         image: postgres:latest
         detach: yes
         auto_remove: yes
@@ -85,7 +84,6 @@
           - name: coypu_net
         purge_networks: yes
         command: PGPASSWORD=docker psql -hpostgres -U postgres trades -c 'CREATE TABLE last_trade (trade_id varchar(32) not null primary key, product varchar(8) not null, last_px float not null, last_size float not null)'
-
         
     - name: Coypu server
       docker_container:
@@ -100,9 +98,9 @@
         purge_networks: yes
         auto_remove: yes
 
-    - name: Coypu load
+    - name: Coypu to kafka
       docker_container:
-        name: coypu_load
+        name: coypu_kafka
         image: coypu_kafka:latest
         detach: yes
         auto_remove: yes
@@ -111,3 +109,16 @@
         purge_networks: yes
         auto_remove: yes
 
+    - name: Kafka to postgres
+      docker_container:
+        name: kafka_postgres
+        image: kafka_postgres:latest
+        detach: yes
+        auto_remove: yes
+        networks:
+          - name: coypu_net
+        purge_networks: yes
+        auto_remove: yes
+
+
+        
