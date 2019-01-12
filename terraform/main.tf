@@ -85,6 +85,18 @@ provider "kubernetes" {
   cluster_ca_certificate = "${base64decode(google_container_cluster.primary.master_auth.0.cluster_ca_certificate)}"
 }
 
+provider "helm" {
+  kubernetes {
+	 host                   = "${google_container_cluster.primary.endpoint}"
+	 username               = "${var.master_username}"
+	 password               = "${var.master_password}"
+	 client_certificate     = "${base64decode(google_container_cluster.primary.master_auth.0.client_certificate)}"
+	 client_key             = "${base64decode(google_container_cluster.primary.master_auth.0.client_key)}"
+	 cluster_ca_certificate = "${base64decode(google_container_cluster.primary.master_auth.0.cluster_ca_certificate)}"
+  }
+}
+
+
 resource "kubernetes_pod" "nginx" {
   metadata {
 	 name = "nginx-example"
@@ -122,6 +134,22 @@ resource "kubernetes_service" "nginx" {
   }
 }
 
+/* need service account
+resource "helm_release" "mydatabase" {
+    name      = "nutriadb"
+    chart     = "stable/postgresql"
+
+    set {
+        name  = "postgresqlUsername"
+        value = "foo"
+    }
+
+    set {
+        name = "postgresqlPassword"
+        value = "qux"
+    }
+}
+*/
 
 output "ip" {
   value = "${google_compute_instance.vm_instance.network_interface.0.access_config.0.nat_ip}"
