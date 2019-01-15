@@ -119,6 +119,14 @@ resource "kubernetes_deployment" "coypu_server" {
 		  container {
 			 name  = "coypu"
 			 image = "gcr.io/massive-acrobat-227416/coypu:${var.coypu_version}"
+
+			 resources {
+				requests {
+				  cpu = "1" 
+				  memory = "256Mi"
+				}
+			 }
+		  
 			 
 			 port {
 				container_port = 8080
