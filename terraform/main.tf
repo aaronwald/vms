@@ -6,6 +6,10 @@ variable "master_password" {
   type="string"
 }
 
+variable "coypu_version" {
+  type="string"
+}
+
 provider "google" {
   project = "massive-acrobat-227416"
   region  = "us-east1"
@@ -114,7 +118,7 @@ resource "kubernetes_deployment" "coypu_server" {
 		spec {
 		  container {
 			 name  = "coypu"
-			 image = "gcr.io/massive-acrobat-227416/coypu:latest"
+			 image = "gcr.io/massive-acrobat-227416/coypu:${var.coypu_version}"
 			 
 			 port {
 				container_port = 8080
@@ -128,33 +132,6 @@ resource "kubernetes_deployment" "coypu_server" {
 	 }
   }
 }
-
-/*
-resource "kubernetes_pod" "coypu" {
-  metadata {
-	 name = "coypu-example"
-	 labels {
-		App = "coypu"
-	 }
-  }
-
-
-  spec {
-	 image_pull_secrets =  {
-		name =  "docker-registry"
-	 }
-
-	 container {
-		image = "gcr.io/massive-acrobat-227416/coypu:latest"
-		name  = "coypu-ws"
-
-		port {
-		  container_port = 8080
-		}
-	 }
-  }
-}
-*/
 
 resource "kubernetes_service" "coypu" {
   metadata {
