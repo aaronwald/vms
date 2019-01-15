@@ -1,4 +1,10 @@
 
+# Deploy with terraform
+
+```
+terraform apply
+```
+
 # Setup creds
 
 ```
