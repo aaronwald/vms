@@ -16,17 +16,7 @@ docker tag coypu gcr.io/massive-acrobat-227416/coypu
 docker push gcr.io/massive-acrobat-227416/coypu:latest
 ```
 
-
-# Check health commands
-```
-kubectl get deployments
-kubectl get pods
-kubectl get services
-kubectl describe pods
-```
-
-
-# Roll a deployment
+# Roll a deployment to a new image
 
 Set the version for the deployment. Set container name to a new image. Image is set on a workload (pod or controllers)
 
@@ -49,3 +39,10 @@ kubectl rollout history deployments/coypu-server
 kubectl rollout undo deployments/coypu-server
 ```
 
+# Check health commands
+```
+kubectl get deployments
+kubectl get pods
+kubectl get services
+kubectl describe pods
+```
