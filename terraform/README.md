@@ -27,6 +27,8 @@ _pod (po), replicationcontroller (rc), deployment (deploy), daemonset (ds), repl
 kubectl set image deployments/coypu-server coypu=gcr.io/massive-acrobat-227416/coypu:v3
 ```
 
+## Check rollout status
+
 ```
 kubectl rollout status deployments/coypu-server
 ```
@@ -34,6 +36,8 @@ kubectl rollout status deployments/coypu-server
 ```
 kubectl rollout history deployments/coypu-server
 ```
+
+## Rollback
 
 ```
 kubectl rollout undo deployments/coypu-server
