@@ -29,6 +29,8 @@ resource "google_container_cluster" "primary" {
 		"https://www.googleapis.com/auth/logging.write",
 		"https://www.googleapis.com/auth/monitoring"
 	 ]
+
+	 machine_type       = "n1-standard-2"
   }
   
   network = "${google_compute_network.vpc_network.name}"
@@ -117,6 +119,43 @@ resource "kubernetes_pod" "nginx" {
   }
 }
 
+resource "kubernetes_secret" "docker-registry" {
+  metadata {
+    name = "docker-registry"
+  }
+
+  data {
+    ".dockerconfigjson" = "${file("pull-container.json")}"
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+}
+
+resource "kubernetes_pod" "coypu" {
+  metadata {
+	 name = "coypu-example"
+	 labels {
+		App = "coypu"
+	 }
+  }
+
+
+  spec {
+	 image_pull_secrets =  {
+		name =  "docker-registry"
+	 }
+
+	 container {
+		image = "gcr.io/massive-acrobat-227416/coypu:latest"
+		name  = "coypu-ws"
+
+		port {
+		  container_port = 8080
+		}
+	 }
+  }
+}
+
 resource "kubernetes_service" "nginx" {
   metadata {
 	 name = "nginx-example"
@@ -133,6 +172,24 @@ resource "kubernetes_service" "nginx" {
 	 type = "LoadBalancer"
   }
 }
+
+resource "kubernetes_service" "coypu" {
+  metadata {
+	 name = "coypu-example"
+  }
+  spec {
+	 selector {
+		App = "${kubernetes_pod.coypu.metadata.0.labels.App}"
+	 }
+	 port {
+		port = 80
+		target_port = 8080
+	 }
+
+	 type = "LoadBalancer"
+  }
+}
+
 
 /* need service account
 resource "helm_release" "mydatabase" {
@@ -169,4 +226,8 @@ output "cluster_ca_certificate" {
 
 output "lb_ip" {
   value = "${kubernetes_service.nginx.load_balancer_ingress.0.ip}"
+}
+
+output "coypu_ip" {
+  value = "${kubernetes_service.coypu.spec.0.cluster_ip}"
 }

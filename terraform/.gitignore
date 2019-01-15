@@ -2,3 +2,4 @@ env.sh
 json.key
 .terraform
 terraform.tfstate*
+pull-container.json
