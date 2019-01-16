@@ -1,3 +1,8 @@
+# Introduction
+
+The environment below will use k8s in GCP to deploy a custom app (coypu). This is done with [terraform](https://www.hashicorp.com/products/terraform).
+
+Helm is then used to deploy jenkins into k8s. The jenkins steps then show how to deploy slaves into k8s pods and optionally pull docker images from the Google container registry.
 
 # Setup Google SDK
 
@@ -41,7 +46,6 @@ docker push gcr.io/massive-acrobat-227416/coypu:v5
 Set the version for the deployment. Set container name to a new image. Image name is set on container specific in workload (pod or controller).
 
 _pod (po), replicationcontroller (rc), deployment (deploy), daemonset (ds), replicaset (rs)_
-
 
 ```
 kubectl set image deployments/coypu-server coypu=gcr.io/massive-acrobat-227416/coypu:v3
@@ -103,15 +107,11 @@ helm install stable/jenkins --set rbac.install=true --name coypu-release
 helm status
 kubectl create -f jenkins.yaml
 ```
-Under configure Jenkins -- Update the credentials config in the cloud section to use the service account credential you created in the step above.
 
-## Jenkins plugins needed
+### Jenkins from command line
 
-* docker-build-step
-* Google Container Registry Auth
-* Google OAuth Credentials
-
-Retrieve the api key from <path to jenkins>/me/configure
+Retrieve the api key from http://jenkins_host:8080/me/configure . 
+Retrieve the pod name from ```helm status coypu-release```
 
 ```
 kubectl exec -it coypu-release-jenkins-7cdc4bf985-8srr4 -- /bin/bash
@@ -119,15 +119,21 @@ java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080
 java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key install-plugin google-container-registry-auth
 java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key install-plugin google-oauth-plugin
 java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key restart
-
 java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key create-job coypu < coypu.xml
 
 ```
 
-## Config docker-build-step
+## Jenkins plugins needed (Not needed when using docker via kubernetes)
 
-* _Global Tool Configuration->Docker Installations_
- * Install automatically
- * Restart required
- 
-* _Configure System->Docker Builder->Docker URL_
+Under configure Jenkins -- Update the credentials config in the cloud section to use the service account credential you created in the step above.
+
+* docker-build-step
+* Google Container Registry Auth
+* Google OAuth Credentials
+
+## Config docker-build-step (NOT NEEDED)
+
+ * _Global Tool Configuration->Docker Installations_
+   * Install automatically
+   * Restart required
+ * _Configure System->Docker Builder->Docker URL_
