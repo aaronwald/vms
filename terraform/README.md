@@ -7,12 +7,13 @@ Install [Google SDK](https://cloud.google.com/sdk/install). Use a versioned arch
 
 Create ```file.json``` at _APIs & Services->Credentials->Create credentials->API Key_
 
-A second key will be needed to pull from the _Container Registry_ in GCP.
+A second key will be needed to pull from the _Container Registry_ in GCP (if using k8s with Jenkins then you can reuse the existing service account with your pods).
 
+See [Example](main.tf) for simple deployment that sets up a cluster, firewall, network, service, and deployment. 
 
 ```
 export GOOGLE_CLOUD_KEYFILE_JSON=<file.json>
-terraform init
+terraform init 
 terraform apply
 ```
 
@@ -67,6 +68,7 @@ kubectl rollout undo deployments/coypu-server
 kubectl get deployments
 kubectl get pods
 kubectl get services
+kubectl get namespaces
 kubectl describe pods
 ```
 
@@ -75,3 +77,57 @@ kubectl describe pods
 ```
 terraform destroy
 ```
+
+# Helm
+
+```
+sudo snap install helm --classic
+kubectl create -f tiller.yaml
+helm init --canary-image --service-account tiller --upgrade
+```
+
+## Check
+```
+kubectl -n kube-system describe deployment tiller-deploy
+kubectl get pods --namespace kube-system
+```
+
+## Helm Cleanup
+```
+kubectl delete deployment tiller-deploy --namespace kube-system
+```
+
+# Jenkins
+```
+helm install stable/jenkins --set rbac.install=true --name coypu-release
+helm status
+kubectl create -f jenkins.yaml
+```
+Under configure Jenkins -- Update the credentials config in the cloud section to use the service account credential you created in the step above.
+
+## Jenkins plugins needed
+
+* docker-build-step
+* Google Container Registry Auth
+* Google OAuth Credentials
+
+Retrieve the api key from <path to jenkins>/me/configure
+
+```
+kubectl exec -it coypu-release-jenkins-7cdc4bf985-8srr4 -- /bin/bash
+java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key install-plugin docker-build-step
+java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key install-plugin google-container-registry-auth
+java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key install-plugin google-oauth-plugin
+java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key restart
+
+java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key create-job coypu < coypu.xml
+
+```
+
+## Config docker-build-step
+
+* _Global Tool Configuration->Docker Installations_
+ * Install automatically
+ * Restart required
+ 
+* _Configure System->Docker Builder->Docker URL_

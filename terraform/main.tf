@@ -27,12 +27,12 @@ provider "kubernetes" {
 
 provider "helm" {
   kubernetes {
-	 host                   = "${google_container_cluster.primary.endpoint}"
-	 username               = "${var.master_username}"
-	 password               = "${var.master_password}"
-	 client_certificate     = "${base64decode(google_container_cluster.primary.master_auth.0.client_certificate)}"
-	 client_key             = "${base64decode(google_container_cluster.primary.master_auth.0.client_key)}"
-	 cluster_ca_certificate = "${base64decode(google_container_cluster.primary.master_auth.0.cluster_ca_certificate)}"
+    host                   = "${google_container_cluster.primary.endpoint}"
+    username               = "${var.master_username}"
+    password               = "${var.master_password}"
+    client_certificate     = "${base64decode(google_container_cluster.primary.master_auth.0.client_certificate)}"
+    client_key             = "${base64decode(google_container_cluster.primary.master_auth.0.client_key)}"
+    cluster_ca_certificate = "${base64decode(google_container_cluster.primary.master_auth.0.cluster_ca_certificate)}"
   }
 }
 
@@ -42,19 +42,19 @@ resource "google_container_cluster" "primary" {
   initial_node_count = 3
   
   master_auth {
-	 username = "${var.master_username}"
-	 password = "${var.master_password}"
+    username = "${var.master_username}"
+    password = "${var.master_password}"
   }
   
   node_config {
-	 oauth_scopes = [
-		"https://www.googleapis.com/auth/compute",
-		"https://www.googleapis.com/auth/devstorage.read_only",
-		"https://www.googleapis.com/auth/logging.write",
-		"https://www.googleapis.com/auth/monitoring"
-	 ]
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/compute",
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring"
+    ]
 
-	 machine_type       = "n1-standard-2"
+    machine_type       = "n1-standard-2"
   }
   
   network = "${google_compute_network.vpc_network.name}"
@@ -65,12 +65,12 @@ resource "google_compute_firewall" "default" {
   network = "${google_compute_network.vpc_network.name}"
 
   allow {
-	 protocol = "icmp"
+    protocol = "icmp"
   }
 
   allow {
-	 protocol = "tcp"
-	 ports    = ["22", "80"]
+    protocol = "tcp"
+    ports    = ["22", "80"]
   }
 }
 
@@ -93,68 +93,68 @@ resource "kubernetes_secret" "docker-registry" {
 
 resource "kubernetes_deployment" "coypu_server" {
   metadata {
-	 name = "coypu-server"
-	 labels {
-		App = "coypu"
-	 }
+    name = "coypu-server"
+    labels {
+      App = "coypu"
+    }
   }
 
   spec {
-	 replicas = 3
+    replicas = 3
 
-	 selector {
-		match_labels {
-		  App = "coypu"
-		}
-	 }
+    selector {
+      match_labels {
+        App = "coypu"
+      }
+    }
 
-	 template {
-		metadata {
-		  labels {
-			 App = "coypu"
-		  }
-		}
+    template {
+      metadata {
+        labels {
+          App = "coypu"
+        }
+      }
 
-		spec {
-		  container {
-			 name  = "coypu"
-			 image = "gcr.io/massive-acrobat-227416/coypu:${var.coypu_version}"
+      spec {
+        container {
+          name  = "coypu"
+          image = "gcr.io/massive-acrobat-227416/coypu:${var.coypu_version}"
 
-			 resources {
-				requests {
-				  cpu = "1" 
-				  memory = "256Mi"
-				}
-			 }
-		  
-			 
-			 port {
-				container_port = 8080
-			 }
-		  }
+          resources {
+            requests {
+              cpu = "1" 
+              memory = "256Mi"
+            }
+          }
+        
+          
+          port {
+            container_port = 8080
+          }
+        }
 
-		  image_pull_secrets =  {
-			 name =  "docker-registry"
-		  }
-		}
-	 }
+        image_pull_secrets =  {
+          name =  "docker-registry"
+        }
+      }
+    }
   }
 }
 
 resource "kubernetes_service" "coypu" {
   metadata {
-	 name = "coypu-example"
+    name = "coypu-example"
   }
   spec {
-	 selector {
-		App = "coypu"
-	 }
-	 port {
-		port = 80
-		target_port = 8080
-	 }
+    selector {
+      App = "coypu"
+    }
+    port {
+      port = 80
+      target_port = 8080
+    }
 
-	 type = "LoadBalancer"
+    type = "LoadBalancer"
   }
 }
 
