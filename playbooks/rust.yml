@@ -1,0 +1,11 @@
+
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: yes
+  roles:
+    - role: fubarhouse.rust
+      vars:
+        rust_version: 1.31.0
+        build_rust_from_source: false
+        rust_update: true
