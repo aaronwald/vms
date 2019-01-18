@@ -10,6 +10,8 @@ Install [Google SDK](https://cloud.google.com/sdk/install). Use a versioned arch
 
 # Deploy to GKE with terraform
 
+See [Google Kubernetes Engine - GKE](https://cloud.google.com/kubernetes-engine/) reference document.
+
 Create ```file.json``` at _APIs & Services->Credentials->Create credentials->API Key_
 
 See [Example](main.tf) for simple deployment that sets up a cluster, firewall, network, service, and deployment. 
@@ -107,7 +109,8 @@ pipeline {
 
 ```
 
-Pod yaml
+Container definition is found in ```pod.yaml```.
+
 
 ```yaml
 apiVersion: v1
@@ -127,13 +130,7 @@ spec:
 
 ```
 
-# Teardown Environment
-
-```
-terraform destroy
-```
-
-# Interact Jenkins from command line
+## Interact Jenkins from command line
 
 Retrieve the api key from http://jenkins_host:8080/me/configure . 
 
@@ -149,63 +146,8 @@ java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080
 
 ```
 
-## Jenkins plugins needed (Not needed when using docker via kubernetes)
-
-Under configure Jenkins -- Update the credentials config in the cloud section to use the service account credential you created in the step above.
-
-* docker-build-step
-* Google Container Registry Auth
-* Google OAuth Credentials
-
-# Docker 
-
-## Deploy build with docker
+# Teardown Environment
 
 ```
-docker tag coypu gcr.io/massive-acrobat-227416/coypu
-docker push gcr.io/massive-acrobat-227416/coypu:v5
+terraform destroy
 ```
-
-# Roll a deployment to a new image in k8s
-
-Set the version for the deployment. Set container name to a new image. Image name is set on container specific in workload (pod or controller).
-
-_pod (po), replicationcontroller (rc), deployment (deploy), daemonset (ds), replicaset (rs)_
-
-```
-kubectl set image deployments/coypu-server coypu=gcr.io/massive-acrobat-227416/coypu:v3
-```
-
-## Check rollout status
-
-```
-kubectl rollout status deployments/coypu-server
-```
-
-```
-kubectl rollout history deployments/coypu-server
-```
-
-## Rollback
-
-```
-kubectl rollout undo deployments/coypu-server
-```
-
-## Check health commands
-```
-kubectl get deployments
-kubectl get pods
-kubectl get services
-kubectl get namespaces
-kubectl describe pods
-```
-
-
-
-## Config docker-build-step (NOT NEEDED)
-
- * _Global Tool Configuration->Docker Installations_
-   * Install automatically
-   * Restart required
- * _Configure System->Docker Builder->Docker URL_
