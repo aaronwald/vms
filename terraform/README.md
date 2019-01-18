@@ -84,7 +84,7 @@ kubectl -n kube-system describe deployment tiller-deploy
 kubectl get pods --namespace kube-system
 ```
 
-![tiller][images/tiller-pod.png]
+![tiller](images/tiller-pod.png)
 
 ## Helm Cleanup
 ```sh
