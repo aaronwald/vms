@@ -1,6 +1,6 @@
 # Introduction
 
-The environment below will use [kubernetes](https://kubernetes.io/) in [GCP](https://cloud.google.com/) to deploy a custom app [coypu](https://github.com/aaronwald/coypu). The initial deployment is done with [terraform](https://www.hashicorp.com/products/terraform).
+The environment below will use [kubernetes](https://kubernetes.io/) in [GCP](https://cloud.google.com/) to deploy a custom app [coypu](https://github.com/aaronwald/coypu). The initial deployment is done with [terraform](https://www.hashicorp.com/products/terraform). Ubuntu 18.04 bionic build. See [Ansible Playbooks](../playbooks/ubuntu.yml) for packages installed on Ubuntu.
 
 [Helm](https://helm.sh/) is then used to deploy [Jenkins](https://jenkins.io/) into the existing GCP cluster. The jenkins steps then show how to deploy slaves into k8s pods and optionally pull docker images from the Google container registry.
 
@@ -11,8 +11,6 @@ Install [Google SDK](https://cloud.google.com/sdk/install). Use a versioned arch
 # Deploy to GKE with terraform
 
 Create ```file.json``` at _APIs & Services->Credentials->Create credentials->API Key_
-
-A second key will be needed to pull from the _Container Registry_ in GCP (if using k8s with Jenkins then you can reuse the existing service account with your pods since k8s is already setup to talk to the regsitry).
 
 See [Example](main.tf) for simple deployment that sets up a cluster, firewall, network, service, and deployment. 
 
@@ -34,7 +32,9 @@ Setup credentials for kubectl from gcloud
 gcloud container clusters get-credentials coypu-cluster --zone us-east1-b
 ```
 
-# Install Helm
+# Install Helm on Ubuntu
+
+See document on (RBAC)[https://github.com/helm/helm/blob/master/docs/rbac.md].
 
 ```
 sudo snap install helm --classic
@@ -53,11 +53,78 @@ kubectl get pods --namespace kube-system
 kubectl delete deployment tiller-deploy --namespace kube-system
 ```
 
-# Install Jenkins
+# Install Jenkins with Helm
+
+See [section](https://github.com/helm/charts/tree/master/stable/jenkins#rbac) on Jenkins RBAC requirements to created ```jenkins.yaml```.
+
 ```
 helm install stable/jenkins --set rbac.install=true --name coypu-release
 helm status
 kubectl create -f jenkins.yaml
+```
+
+## Jenkinsfile
+
+Example ```Jenkinsfile``` which will create a pod with a custom docker image. 
+
+```groovy
+pipeline {
+    agent {
+        kubernetes {
+            label 'mypod'
+            defaultContainer 'jnlp'
+            yamlFile 'pod.yaml'
+        }
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                container('coypullvm') {
+                    sh 'mkdir -p build'
+                    sh '''
+                  export LD_LIBRARY_PATH=/usr/local/lib/ &&
+                  mkdir libs &&
+                  cd libs &&
+                  git clone https://github.com/Tencent/rapidjson.git &&
+                  cd .. &&
+                  cd build &&
+                  cmake -D CMAKE_BUILD_TYPE=Debug -D BUILD_TESTING=ON .. &&
+                  make coyputest &&
+                  ./coyputest --gtest_output="xml:testresults.xml"
+                '''
+                }
+            }
+        }
+        stage ('test') {
+            steps {
+                container('coypullvm') {
+                    junit 'build/testresults.xml'
+                }
+            }
+        }
+    }
+}
+
+```
+
+Pod yaml
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: some-label-value
+spec:
+  containers:
+  - name: coypullvm
+    image: gcr.io/massive-acrobat-227416/coypu_llvm:latest
+    command:
+    - cat
+    tty: true
+    image_pull_secrets:
+      -name: docker-registry
+
 ```
 
 # Teardown Environment
@@ -66,9 +133,10 @@ kubectl create -f jenkins.yaml
 terraform destroy
 ```
 
-## Jenkins from command line
+# Interact Jenkins from command line
 
 Retrieve the api key from http://jenkins_host:8080/me/configure . 
+
 Retrieve the pod name from ```helm status coypu-release```
 
 ```
