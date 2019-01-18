@@ -55,12 +55,36 @@ kubectl create -f tiller.yaml
 helm init --canary-image --service-account tiller --upgrade
 ```
 
+Example ```tiller.yaml```
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: tiller
+    namespace: kube-system
+```
+
 ## Check Helm Status
 
 ```sh
 kubectl -n kube-system describe deployment tiller-deploy
 kubectl get pods --namespace kube-system
 ```
+
+![tiller][images/tiller-pod.png]
 
 ## Helm Cleanup
 ```sh
@@ -73,8 +97,29 @@ See [section](https://github.com/helm/charts/tree/master/stable/jenkins#rbac) on
 
 ```sh
 helm install stable/jenkins --set rbac.install=true --name coypu-release
-helm status
-kubectl create -f jenkins.yaml
+```
+
+Example ```jenkins.yaml```
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: tiller
+    namespace: kube-system
 ```
 
 ## Jenkinsfile
