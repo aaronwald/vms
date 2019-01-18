@@ -15,7 +15,7 @@ variable "project_name" {
 }
 
 provider "google" {
-  project = "${project_name}"
+  project = "${var.project_name}"
   region  = "us-east1"
   zone    = "us-east1-b"
 }
@@ -122,7 +122,7 @@ resource "kubernetes_deployment" "coypu_server" {
       spec {
         container {
           name  = "coypu"
-          image = "gcr.io/${project_name}/coypu:${var.coypu_version}"
+          image = "gcr.io/${var.project_name}/coypu:${var.coypu_version}"
 
           resources {
             requests {
