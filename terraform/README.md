@@ -99,28 +99,13 @@ See [section](https://github.com/helm/charts/tree/master/stable/jenkins#rbac) on
 helm install stable/jenkins --set rbac.install=true --name coypu-release
 ```
 
-Example ```jenkins.yaml```
+Make note of the password and URL.
 
-```yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: tiller
-  namespace: kube-system
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: tiller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-  - kind: ServiceAccount
-    name: tiller
-    namespace: kube-system
-```
+![helm](images/helm-install.png)
+
+Wait for the jenkins pod to start.
+
+![jenkins pod](images/jenkins-pod.png)
 
 ## Jenkinsfile
 
@@ -187,21 +172,19 @@ spec:
 
 ```
 
-## Interact Jenkins from command line
+## Add a new project
 
-Retrieve the api key from http://jenkins_host:8080/me/configure . 
+![jenkins project](images/jenkins-project.png)
 
-Retrieve the pod name from ```helm status coypu-release```
+## Setup your project source
 
-```sh
-kubectl exec -it coypu-release-jenkins-7cdc4bf985-8srr4 -- /bin/bash
-java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key install-plugin docker-build-step
-java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key install-plugin google-container-registry-auth
-java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key install-plugin google-oauth-plugin
-java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key restart
-java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:api_key create-job coypu < coypu.xml
+![branch source](images/branch_source.png)
 
-```
+## Jenkins job in k8s
+
+Check that the job is running in k8s.
+
+![jenkins job](images/jenkins-job.png)
 
 # Teardown Environment
 
