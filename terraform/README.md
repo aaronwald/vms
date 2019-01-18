@@ -99,7 +99,7 @@ See [section](https://github.com/helm/charts/tree/master/stable/jenkins#rbac) on
 helm install stable/jenkins --set rbac.install=true --name coypu-release
 ```
 
-Make note of the password and URL.
+Make note of the password and URL from ```heml install```. To recover you can run ```helm status coypu-release```.
 
 ![helm](images/helm-install.png)
 
@@ -109,7 +109,7 @@ Wait for the jenkins pod to start.
 
 ## Jenkinsfile
 
-Example ```Jenkinsfile``` which will create a pod with a custom docker image. 
+Example declarative ```Jenkinsfile``` which will create a pod with a custom docker image. 
 
 ```groovy
 pipeline {
