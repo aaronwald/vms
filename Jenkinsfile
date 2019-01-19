@@ -1,21 +1,14 @@
 pipeline {
-    agent {
-		  kubernetes {
-            label 'mypod'
-            defaultContainer 'jnlp'
-		  }
-	 }
+    agent any
 	 
     stages {
         stage('Build image') {
             steps {
-					 container('jnlp') {
-						  echo 'Starting to build docker image'
+					 echo 'Starting to build docker image'
 					 
-						  script {
-								def customImage = docker.build("coypu_llvm:${env.BUILD_ID}")
-								//                    customImage.push()
-						  }
+					 script {
+						  def customImage = docker.build("coypu_llvm:${env.BUILD_ID}")
+						  //                    customImage.push()
 					 }
             }
         }
