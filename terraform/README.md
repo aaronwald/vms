@@ -19,7 +19,7 @@ See [Google Kubernetes Engine - GKE](https://cloud.google.com/kubernetes-engine/
 
 Create ```file.json``` at _APIs & Services->Credentials->Create credentials->API Key_
 
-See [example terraform file](main.tf) for simple deployment that sets up a cluster, firewall, network, service, and deployment. 
+See [example terraform file](main.tf) for simple deployment that sets up a cluster, firewall, network, service, and deployment. The reference example also sets up a separate deployment for a customd docker image. This can be edited out.
 
 ```sh
 export GOOGLE_CLOUD_KEYFILE_JSON=<file.json>
@@ -39,7 +39,7 @@ Setup credentials for kubectl from gcloud
 gcloud container clusters get-credentials coypu-cluster --zone us-east1-b
 ```
 
-Verify 
+Verify k8s is pointing to GCP instance.
 
 ```sh
 kubectl config view
