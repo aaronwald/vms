@@ -163,7 +163,7 @@ metadata:
 spec:
   containers:
   - name: coypullvm
-    image: gcr.io/massive-acrobat-227416/coypu_llvm:latest
+    image: gcr.io/some_project_name/coypu_llvm:latest
     command:
     - cat
     tty: true
