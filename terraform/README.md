@@ -80,7 +80,6 @@ subjects:
 ## Check Helm Status
 
 ```sh
-kubectl -n kube-system describe deployment tiller-deploy
 kubectl get pods --namespace kube-system
 ```
 
@@ -109,7 +108,7 @@ Wait for the jenkins pod to start.
 
 ## Jenkinsfile
 
-Example declarative ```Jenkinsfile``` which will create a pod with a custom docker image. 
+Example [declarative](https://jenkins.io/doc/book/pipeline/syntax/) ```Jenkinsfile``` which will create a pod with a custom docker image. 
 
 ```groovy
 pipeline {
