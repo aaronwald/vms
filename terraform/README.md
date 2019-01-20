@@ -95,7 +95,7 @@ kubectl delete deployment tiller-deploy --namespace kube-system
 See [section](https://github.com/helm/charts/tree/master/stable/jenkins#rbac) on Jenkins RBAC requirements to created ```jenkins.yaml```.
 
 ```sh
-helm install stable/jenkins --set rbac.install=true --name coypu-release
+helm install stable/jenkins --set rbac.install=true --name coypu-release -f values.yaml
 ```
 
 Make note of the password and URL from ```heml install```. To recover you can run ```helm status coypu-release```.
