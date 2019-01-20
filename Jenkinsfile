@@ -1,8 +1,7 @@
 pipeline {
 	 agent {
         kubernetes {
-            label 'mypod'
-            defaultContainer 'jnlp'
+            label 'jnlp'
         }
     }
 

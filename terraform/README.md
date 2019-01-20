@@ -24,9 +24,15 @@ See [example terraform file](main.tf) for simple deployment that sets up a clust
 ```sh
 export GOOGLE_CLOUD_KEYFILE_JSON=<file.json>
 terraform init 
-terraform apply
+terraform apply -var 'project_name=<project_name>'
 ```
- 
+
+Get GCP projects
+
+```
+gcloud projects list 
+```
+
 Setup creds for docker
 
 ```sh
