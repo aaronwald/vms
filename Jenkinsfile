@@ -1,7 +1,7 @@
 pipeline {
 	 agent {
         kubernetes {
-            label 'jnlp'
+            label 'coypu-release-jenkins-slave'
         }
     }
 
