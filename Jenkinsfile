@@ -1,7 +1,8 @@
 pipeline {
 	 agent {
         kubernetes {
-            label 'coypu-release-jenkins-slave'
+				name 'coypu_container_build'
+            label 'coypu_llvm'
         }
     }
 
