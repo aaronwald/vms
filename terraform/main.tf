@@ -144,38 +144,3 @@ resource "kubernetes_deployment" "coypu_server" {
     }
   }
 }
-
-resource "kubernetes_service" "coypu" {
-  metadata {
-    name = "coypu-example"
-  }
-  spec {
-    selector {
-      App = "coypu"
-    }
-    port {
-      port = 80
-      target_port = 8080
-    }
-
-    type = "LoadBalancer"
-  }
-}
-
-/*
-output "client_certificate" {
-  value = "${google_container_cluster.primary.master_auth.0.client_certificate}"
-}
-
-output "client_key" {
-  value = "${google_container_cluster.primary.master_auth.0.client_key}"
-}
-
-output "cluster_ca_certificate" {
-  value = "${google_container_cluster.primary.master_auth.0.cluster_ca_certificate}"
-}
-*/
-
-output "coypu_ip" {
-  value = "${kubernetes_service.coypu.load_balancer_ingress.0.ip}"
-}
