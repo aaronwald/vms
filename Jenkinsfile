@@ -1,6 +1,5 @@
 pipeline {
 	 agent {
-		  name 'coypu_container_build'
         kubernetes {
             label 'coypu_llvm'
         }
