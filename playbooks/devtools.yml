@@ -13,7 +13,7 @@
      spdlog_version: v1.1.0
      json_version: v3.3.0
      rapidjson_git_url: https://github.com/Tencent/rapidjson.git
-     rapidjson_version: v1.1.10
+     rapidjson_version: v1.1.0
      rapidjson_dir: "/opt/rapidjson"
 
   tasks:
