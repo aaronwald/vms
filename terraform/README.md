@@ -193,6 +193,14 @@ Check that the job is running in k8s.
 
 # Teardown Environment
 
+## Helm
+
+```
+helm delete coypu-release
+```
+
+## Terraform
+
 ```
 terraform destroy
 ```
