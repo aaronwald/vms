@@ -152,9 +152,9 @@
       args:
         chdir: "{{ bits_dir }}/grpc/build"
 
-    - name: grpc install
-      command: make install
-      args:
-        chdir: "{{ bits_dir }}/grpc/build"
+#    - name: grpc install
+#      command: make install
+#      args:
+#        chdir: "{{ bits_dir }}/grpc/build"
 
       
