@@ -83,4 +83,13 @@
           - python-pip
           - python3-dev
           - golang-go
-          
+          - libcunit1-dev
+          - libxml2-dev
+          - libev-dev
+          - libevent-dev
+          - libjansson-dev 
+          - libc-ares-dev
+          - libjemalloc-dev
+          - libsystemd-dev 
+          - cython
+          - python-setuptools
