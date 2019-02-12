@@ -15,6 +15,8 @@
      rapidjson_git_url: https://github.com/Tencent/rapidjson.git
      rapidjson_version: v1.1.0
      rapidjson_dir: "/opt/rapidjson"
+     nghttp2_git_url: https://github.com/nghttp2/nghttp2.git
+     nghttp2_version: v1.36.0
 
   tasks:
     - name: Download git
@@ -139,3 +141,50 @@
         repo: "{{ rapidjson_git_url }}"
         dest: "{{ rapidjson_dir }}"
         version: "{{ rapidjson_version }}"
+
+    - name: Clean nghttp2
+      file:
+        state: absent
+        path: "/opt/nghttp2/"
+        
+    - name: Clone nghttp2
+      git:
+        repo: "{{ nghttp2_git_url }}"
+        dest: /opt/nghttp2
+        version: "{{ nghttp2_version }}"
+
+    - name: Configure nghttp2 - git submodule
+      command: git submodule update --init
+      args:
+        chdir: "/opt/nghttp2"
+
+    - name: Configure nghttp2 - autoreconfg
+      command: autoreconf -i
+      args:
+        chdir: "/opt/nghttp2"
+
+    - name: Configure nghttp2 - automake
+      command: automake
+      args:
+        chdir: "/opt/nghttp2"
+
+    - name: Configure nghttp2 - autoconf
+      command: autoconf 
+      args:
+        chdir: "/opt/nghttp2"
+
+    - name: Configure nghttp2 - configure
+      command: ./configure
+      args:
+        chdir: "/opt/nghttp2"
+
+    - name: Build nghttp2
+      command: make
+      args:
+        chdir: "/opt/nghttp2"
+      
+    - name: Install nghttp2
+      command: make install
+      args:
+        chdir: "/opt/nghttp2"
+
