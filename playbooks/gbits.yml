@@ -142,15 +142,15 @@
         state: directory
         mode: 0755
 
-    - name: grpc cmake
-      command: /usr/local/bin/cmake "{{ bits_dir }}/grpc" -DCMAKE_CXX_COMPILER="/usr/local/bin/clang++" -DCMAKE_C_COMPILER="/usr/local/bin/clang" -DCMAKE_CXX_FLAGS="-std=c++14 -stdlib=libc++ -lc++abi -Wno-error=unused-command-line-argument" -DCMAKE_EXE_LINKER_FLAGS="-lc++abi -Wno-warn=unused-command-line-argument"
-      args:
-        chdir: "{{ bits_dir }}/grpc/build"
+#    - name: grpc cmake
+#      command: /usr/local/bin/cmake "{{ bits_dir }}/grpc" -DCMAKE_CXX_COMPILER="/usr/local/bin/clang++" -DCMAKE_C_COMPILER="/usr/local/bin/clang" -DCMAKE_CXX_FLAGS="-std=c++14 -stdlib=libc++ -lc++abi -Wno-error=unused-command-line-argument" -DCMAKE_EXE_LINKER_FLAGS="-lc++abi -Wno-warn=unused-command-line-argument"
+#      args:
+#        chdir: "{{ bits_dir }}/grpc/build"
 
-    - name: grpc make
-      command: make -j 4
-      args:
-        chdir: "{{ bits_dir }}/grpc/build"
+#    - name: grpc make
+#      command: make -j 4
+#      args:
+#        chdir: "{{ bits_dir }}/grpc/build"
 
 #    - name: grpc install
 #      command: make install
