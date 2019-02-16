@@ -31,10 +31,10 @@ spec:
     app: coypu
     name: coypu
   ports:
-    - name: websocket-port
+    - name: http
       port: 8080
       targetPort: 8080
-    - name: grpc-port
+    - name: grpc
       port: 8333
       targetPort: 8089
 ---
@@ -44,7 +44,6 @@ metadata:
   name: coypu-websockets
 spec:
   hosts:
-  - ws.kraken.com
   - ws-feed.pro.coinbase.com
   ports:
   - number: 443
@@ -87,3 +86,4 @@ spec:
         host: coypu-svc
       weight: 100
     websocketUpgrade: true
+ 
