@@ -1,0 +1,89 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+    name: coypu
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: coypu
+        app: coypu
+        version: 1.0.0
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: application
+        image: gcr.io/massive-acrobat-227416/coypu:latest
+        ports:
+        - containerPort: 8080
+          name: websocket-port
+        - containerPort: 8089
+          name: grpc-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coypu-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: coypu
+    name: coypu
+  ports:
+    - name: websocket-port
+      port: 8080
+      targetPort: 8080
+    - name: grpc-port
+      port: 8333
+      targetPort: 8089
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: coypu-websockets
+spec:
+  hosts:
+  - ws.kraken.com
+  - ws-feed.pro.coinbase.com
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: coypu-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: httpbin
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - coypu-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /websocket
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: coypu-svc
+      weight: 100
+    websocketUpgrade: true

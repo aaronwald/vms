@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+    name: coypu
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: coypu
+        app: coypu
+        version: 1.0.0
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: application
+        image: gcr.io/massive-acrobat-227416/coypu:latest
+        ports:
+        - containerPort: 8080
+          name: websocket-port
+        - containerPort: 8089
+          name: grpc-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coypu-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: coypu
+    name: coypu
+  ports:
+    - name: websocket-port
+      port: 8080
+      targetPort: 8080
+    - name: grpc-port
+      port: 8333
+      targetPort: 8089
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coypu-lb-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: coypu
+    name: coypu
+  ports:
+  - protocol: TCP
+    port: 60000
+    targetPort: 8080
+    
