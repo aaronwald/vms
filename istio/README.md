@@ -26,7 +26,7 @@ helm init --service-account tiller
 After tiller pod starts we can install istio. Set ```tracing.enabled=true``` to start jaeger.
 
 ```bash
-helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set tracing.enabled=true --set grafana.enabled=true --set kiali.enabled=true
+helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set tracing.enabled=true --set grafana.enabled=true --set kiali.enabled=false
 cd ..
 ```
 
@@ -38,6 +38,8 @@ Deploy coypu in namespace with istio injection enable
 kubectl create namespace istio-apps
 kubectl label namespace istio-apps istio-injection=enabled
 kubectl apply -f coypu-istio.yaml -n istio-apps
+
+kubectl apply -f gdax-test.yaml -n istio-apps
 ```
 
 # Check ingress IP and ports 

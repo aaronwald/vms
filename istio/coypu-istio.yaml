@@ -13,18 +13,18 @@ spec:
     spec:
       serviceAccountName: default
       containers:
-      - name: application
+      - name: coypu
         image: gcr.io/massive-acrobat-227416/coypu:latest
         ports:
         - containerPort: 8080
-          name: websocket-port
+          name: http-port
         - containerPort: 8089
           name: grpc-port
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: coypu-svc
+  name: coypusvc
 spec:
   type: ClusterIP
   selector:
@@ -34,7 +34,7 @@ spec:
     - name: http
       port: 8080
       targetPort: 8080
-    - name: grpc
+    - name: grpc-port
       port: 8333
       targetPort: 8089
 ---
@@ -54,7 +54,7 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: coypu-gateway
+  name: coypugateway
 spec:
   selector:
     istio: ingressgateway # use Istio default gateway implementation
@@ -69,12 +69,12 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: httpbin
+  name: coypu-vs
 spec:
   hosts:
   - "*"
   gateways:
-  - coypu-gateway
+  - coypugateway
   http:
   - match:
     - uri:
@@ -83,7 +83,17 @@ spec:
     - destination:
         port:
           number: 8080
-        host: coypu-svc
+        host: coypusvc
       weight: 100
     websocketUpgrade: true
- 
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: 8333
+        host: coypusvc
+    retries:
+      attempts: 25
+      perTryTimeout: 1s
