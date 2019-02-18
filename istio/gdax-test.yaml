@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+    name: gdax
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: gdax
+        app: gdax
+        version: 1.0.0
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: application
+        image: gcr.io/massive-acrobat-227416/gdax:latest
+        ports:
+        - containerPort: 8080
+          name: websocket-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gdax-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: gdax
+    name: gax
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: gdax-se
+spec:
+  hosts:
+  - ws-feed.pro.coinbase.com
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  resolution: DNS
