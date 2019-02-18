@@ -16,9 +16,18 @@ curl -L https://git.io/getLatestIstio | sh -
 ```bash
 terraform apply
 gcloud container clusters get-credentials coypu-cluster --zone us-east1-b
+kubectl create namespace istio-system
+kubectl apply -f kiali-secret.yaml
 cd istio-1.0.6
 kubectl apply -f install/kubernetes/helm/helm-service-account.yaml
 helm init --service-account tiller
+```
+
+## Setup kiali
+
+```bash
+echo -n admin | base64
+YWRtaW4=
 ```
 
 ### Install istio with helm
@@ -26,7 +35,7 @@ helm init --service-account tiller
 After tiller pod starts we can install istio. Set ```tracing.enabled=true``` to start jaeger.
 
 ```bash
-helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set tracing.enabled=true --set grafana.enabled=true --set kiali.enabled=false
+helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set tracing.enabled=true --set grafana.enabled=true --set kiali.enabled=true
 cd ..
 ```
 
@@ -38,15 +47,13 @@ Deploy coypu in namespace with istio injection enable
 kubectl create namespace istio-apps
 kubectl label namespace istio-apps istio-injection=enabled
 kubectl apply -f coypu-istio.yaml -n istio-apps
-
-kubectl apply -f gdax-test.yaml -n istio-apps
 ```
 
 # Check ingress IP and ports 
 ```bash
 kubectl get svc istio-ingressgateway -n istio-system
 ```
- 
+kubectl -n istio-system get svc kiali 
 
 # Links
 
@@ -55,13 +62,17 @@ kubectl get svc istio-ingressgateway -n istio-system
  * https://istio.io/docs/examples/advanced-egress/egress-gateway/
 
 
+
+
 # Connect to Jaeger
 
 Set to all interfaces ```0.0.0.0``` .
 
 ```bash
 kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=grafana -o jsonpath='{.items[0].metadata.name}') 3000:3000 --address 0.0.0.0 &
-kubectl port-forward -n istio-system $(kubectl get pod -n istio-system -l app=jaeger -o jsonpath='{.items[0].metadata.name}') 16686:16686 --address 0.0.0.0  &
+kubectl port-forward -n istio-system $(kubectl get pod -n istio-system -l app=jaeger -o jsonpath='{.items[0].metadata.name}') 16686:16686 --address 0.0.0.0  & 
+kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=kiali -o jsonpath='{.items[0].metadata.name}') 20001:20001 --address 0.0.0.0 &
+
 ```
 
 export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
