@@ -31,7 +31,7 @@ helm install install/kubernetes/helm/istio --name istio --namespace istio-system
 cd ..
 ```
 
-## DEploy coypu app and service to istio-app namespace
+## Deploy coypu app and service to istio-app namespace
 
 Deploy coypu in namespace with istio injection enable
 
