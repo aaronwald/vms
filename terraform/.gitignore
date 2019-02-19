@@ -3,3 +3,4 @@ json.key
 .terraform
 terraform.tfstate*
 pull-container.json
+terraform.tfvars
