@@ -17,6 +17,9 @@
      rapidjson_dir: "/opt/rapidjson"
      nghttp2_git_url: https://github.com/nghttp2/nghttp2.git
      nghttp2_version: v1.36.0
+     musl_git_url: git://git.musl-libc.org/musl
+     musl_version: v1.1.21
+     musl_dir: "/opt/musl"
 
   tasks:
     - name: Download git
@@ -50,6 +53,29 @@
       args:
         chdir: "/opt/git-{{ git_version }}/"
         
+    - name: Clone musl
+      git:
+        repo: "{{ musl_git_url }}"
+        dest: "{{ musl_dir }}"
+        version: "{{ musl_version }}"
+
+    - name: Configure musl
+      command: ./configure
+      args:
+        chdir: "{{ musl_dir }}"
+
+
+    - name: Make musl
+      command: make -j 4
+      args:
+        chdir: "{{ musl_dir }}"
+
+
+    - name: Install musl
+      command: make install
+      args:
+        chdir: "{{ musl_dir }}"
+
     - name: Download cmake
       get_url:
         url: "https://cmake.org/files/v3.12/cmake-{{ cmake_version }}.tar.gz"
@@ -187,4 +213,3 @@
       command: make install
       args:
         chdir: "/opt/nghttp2"
-
