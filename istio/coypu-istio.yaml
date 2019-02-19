@@ -1,35 +1,11 @@
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-    name: coypu
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        name: coypu
-        app: coypu
-        version: 1.0.0
-    spec:
-      serviceAccountName: default
-      containers:
-      - name: coypu
-        image: gcr.io/massive-acrobat-227416/coypu:latest
-        ports:
-        - containerPort: 8080
-          name: http-port
-        - containerPort: 8089
-          name: grpc-port
----
 apiVersion: v1
 kind: Service
 metadata:
-  name: coypusvc
+  name: coypu
 spec:
   type: ClusterIP
   selector:
     app: coypu
-    name: coypu
   ports:
     - name: http
       port: 8080
@@ -38,13 +14,70 @@ spec:
       port: 8333
       targetPort: 8089
 ---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: coypu-v1
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: coypu
+        version: v1
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: coypu
+        image: gcr.io/massive-acrobat-227416/coypu:v1
+        ports:
+        - containerPort: 8080
+          name: http-port
+        - containerPort: 8089
+          name: grpc-port
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: coypu-v2
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: coypu
+        version: v2
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: coypu
+        image: gcr.io/massive-acrobat-227416/coypu:v2
+        ports:
+        - containerPort: 8080
+          name: http-port
+        - containerPort: 8089
+          name: grpc-port
+---
 apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry
 metadata:
-  name: coypu-websockets
+  name: coypu-coinbase
 spec:
   hosts:
   - ws-feed.pro.coinbase.com
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: coypu-kraken
+spec:
+  hosts:
+  - ws.kraken.com
   ports:
   - number: 443
     name: https
@@ -67,6 +100,20 @@ spec:
       - "*"
 ---
 apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: coypu-rule
+spec:
+  host: coypu
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+---      
+apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: coypu-vs
@@ -83,8 +130,15 @@ spec:
     - destination:
         port:
           number: 8080
-        host: coypusvc
-      weight: 100
+        host: coypu
+        subset: v1
+      weight: 50
+    - destination:
+        port:
+          number: 8080
+        host: coypu
+        subset: v2
+      weight: 50      
     websocketUpgrade: true
   - match:
     - uri:
@@ -93,7 +147,7 @@ spec:
     - destination:
         port:
           number: 8333
-        host: coypusvc
+        host: coypu
     retries:
       attempts: 25
       perTryTimeout: 1s
