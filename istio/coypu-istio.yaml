@@ -51,7 +51,7 @@ spec:
       serviceAccountName: default
       containers:
       - name: coypu
-        image: gcr.io/massive-acrobat-227416/coypu:v2
+        image: gcr.io/massive-acrobat-227416/coypu:v3
         ports:
         - containerPort: 8080
           name: http-port
@@ -61,20 +61,7 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry
 metadata:
-  name: coypu-coinbase
-spec:
-  hosts:
-  - ws-feed.pro.coinbase.com
-  ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
-  resolution: DNS
----
-apiVersion: networking.istio.io/v1alpha3
-kind: ServiceEntry
-metadata:
-  name: coypu-kraken
+  name: coypu-se1
 spec:
   hosts:
   - ws.kraken.com
@@ -82,7 +69,143 @@ spec:
   - number: 443
     name: https
     protocol: HTTPS
-  resolution: DNS
+  resolution: NONE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: coypu-se2
+spec:
+  hosts:
+  - ws-feed.pro.coinbase.com
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  resolution: NONE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: istio-egressgateway
+spec:
+  selector:
+    istio: egressgateway
+  servers:
+  - port:
+      number: 433
+      name: https
+      protocol: HTTPS
+    hosts:
+    - ws.kraken.com
+    - ws-feed.pro.coinbase.com
+    tls:
+      mode: MUTUAL
+      serverCertificate: /etc/certs/cert-chain.pem
+      privateKey: /etc/certs/key.pem
+      caCertificates: /etc/certs/root-cert.pem
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: egressgateway-for-kraken
+spec:
+  host: istio-egressgateway.istio-system.svc.cluster.local
+  subsets:
+  - name: kraken
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN
+      portLevelSettings:
+      - port:
+          number: 443
+        tls:
+          mode: ISTIO_MUTUAL
+          sni: ws.kraken.com
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: egressgateway-for-coinbase
+spec:
+  host: istio-egressgateway.istio-system.svc.cluster.local
+  subsets:
+  - name: coinbase
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN
+      portLevelSettings:
+      - port:
+          number: 443
+        tls:
+          mode: ISTIO_MUTUAL
+          sni: ws-feed.pro.coinbase.com
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: direct-kraken-through-egress-gateway
+spec:
+  hosts:
+  - ws.kraken.com
+  gateways:
+  - istio-egressgateway
+  - mesh
+  http:
+  - match:
+    - gateways:
+      - mesh
+      port: 443
+    route:
+    - destination:
+        host: istio-egressgateway.istio-system.svc.cluster.local
+        subset: kraken
+        port:
+          number: 443
+      weight: 100
+  - match:
+    - gateways:
+      - istio-egressgateway
+      port: 443
+    route:
+    - destination:
+        host: ws.kraken.com
+        port:
+          number: 443
+      weight: 100
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: direct-coinbase-through-egress-gateway
+spec:
+  hosts:
+  - ws-feed.pro.coinbase.com
+  gateways:
+  - istio-egressgateway
+  - mesh
+  http:
+  - match:
+    - gateways:
+      - mesh
+      port: 443
+    route:
+    - destination:
+        host: istio-egressgateway.istio-system.svc.cluster.local
+        subset: coinbase
+        port:
+          number: 443
+      weight: 100
+  - match:
+    - gateways:
+      - istio-egressgateway
+      port: 443
+    route:
+    - destination:
+        host: ws-feed.pro.coinbase.com
+        port:
+          number: 443
+      weight: 100     
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
@@ -142,7 +265,7 @@ spec:
     websocketUpgrade: true
   - match:
     - uri:
-        prefix: /
+        prefix: /grpc
     route:
     - destination:
         port:

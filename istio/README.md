@@ -20,6 +20,9 @@ kubectl apply -f kiali-secret.yaml
 cd istio-1.0.6
 kubectl apply -f install/kubernetes/helm/helm-service-account.yaml
 helm init --service-account tiller
+sleep 30
+helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set tracing.enabled=true --set grafana.enabled=true --set kiali.enabled=true
+cd ..
 ```
 
 ## Install istio with helm
@@ -27,8 +30,6 @@ helm init --service-account tiller
 After tiller pod starts we can install istio. Set ```tracing.enabled=true``` to start jaeger.
 
 ```bash
-helm install install/kubernetes/helm/istio --name istio --namespace istio-system --set tracing.enabled=true --set grafana.enabled=true --set kiali.enabled=true
-cd ..
 ```
 
 ## Deploy coypu app and service to istio-app namespace
@@ -53,8 +54,10 @@ In these examples we set the interface to _0.0.0.0_.
 
 ```bash
 kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=grafana -o jsonpath='{.items[0].metadata.name}') 3000:3000 --address 0.0.0.0 &
-kubectl port-forward -n istio-system $(kubectl -n istio-system get pod -l app=jaeger -o jsonpath='{.items[0].metadata.name}') 16686:16686 --address 0.0.0.0  & 
+kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=jaeger -o jsonpath='{.items[0].metadata.name}') 16686:16686 --address 0.0.0.0  & 
 kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=kiali -o jsonpath='{.items[0].metadata.name}') 20001:20001 --address 0.0.0.0 &
+
+kubectl -n istio-system port-forward $(kubectl -n istio-apps get pod -l version=v2 -o jsonpath='{.items[0].metadata.name}') 9000:9000 --address 0.0.0.0 &
 
 ```
 
@@ -76,4 +79,9 @@ export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -
 
 ```bash
 echo -n admin | base64
+```
+
+## Mixer debug
+```bash
+kubectl -n istio-system logs -l istio-mixer-type=telemetry -c mixer | grep 'www.google.com'
 ```
