@@ -93,3 +93,9 @@
           - libsystemd-dev 
           - cython
           - python-setuptools
+          - nasm
+          - jq
+          - irssi
+          - irssi-scripts
+          - xen-utils-common
+          - libncurses-dev
