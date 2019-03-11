@@ -13,3 +13,4 @@ RUN ansible-playbook playbooks/devtools.yml
 RUN ansible-playbook playbooks/llvm.yml
 RUN ansible-playbook playbooks/gbits.yml
 RUN ansible-playbook playbooks/bcc.yml
+RUN ansible-playbook playbooks/dpdk.yml

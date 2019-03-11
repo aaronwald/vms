@@ -1,0 +1,52 @@
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: no
+  vars:
+     ansible_python_interpreter: /usr/bin/python2.7
+     bits_dir: "/tmp/bits"
+     dpdk_git_url: https://github.com/DPDK/dpdk.git
+     dpdk_version: v19.02
+     dpdk_target: x86_64-native-linuxapp-gcc
+     spdk_git_url: https://github.com/spdk/spdk.git
+     spdk_version: v19.01
+     
+
+  tasks:
+    - name: Clone dpdk
+      git:
+        repo: "{{ dpdk_git_url }}"
+        dest: "{{ bits_dir }}/dpdk"
+        version: "{{ dpdk_version }}"
+
+    - name: dpdk make config
+      command: make config T="{{ dpdk_target}}"
+      args:
+        chdir: "{{ bits_dir }}/dpdk/"
+
+    - name: dpdk build 
+      command: make
+      args:
+        chdir: "{{ bits_dir }}/dpdk/"
+
+    - name: dpdk install
+      command: make install prefix=/usr/local
+      args:
+        chdir: "{{ bits_dir }}/dpdk/"
+        
+    - name: Clone spdk
+      git:
+        repo: "{{ spdk_git_url }}"
+        dest: "{{ bits_dir }}/spdk"
+        version: "{{ spdk_version }}"
+
+
+    - name: dpdk configure
+      command: ./configure --with-dpdk=/usr/local/share/dpdk/"{{ dpdk_target }}"/
+      args:
+        chdir: "{{ bits_dir }}/spdk/"
+        
+    - name: spdk install
+      command: make install
+      args:
+        chdir: "{{ bits_dir }}/spdk/"
