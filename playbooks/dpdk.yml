@@ -9,7 +9,7 @@
      dpdk_version: v19.02
      dpdk_target: x86_64-native-linuxapp-gcc
      spdk_git_url: https://github.com/spdk/spdk.git
-     spdk_version: v19.01
+     spdk_version: v19.10.1
      
 
   tasks:
