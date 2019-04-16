@@ -100,3 +100,4 @@
           - xen-utils-common
           - libncurses-dev
           - xen-hypervisor-amd64
+          - libpcap-dev
