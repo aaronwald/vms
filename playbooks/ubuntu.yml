@@ -105,6 +105,10 @@
           - graphviz
           - libmnl-dev
           - libmnl0
-          - libibverbs
-          - libibverbs-dev
-          
+          - debhelper 
+          - chrpath 
+          - dkms 
+          - dpatch 
+          - libcr-dev 
+          - quilt 
+          - swig
