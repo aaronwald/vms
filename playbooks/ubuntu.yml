@@ -103,4 +103,6 @@
           - libpcap-dev
           - doxygen
           - graphviz
+          - libmnl-dev
+          - libmnl0
           
